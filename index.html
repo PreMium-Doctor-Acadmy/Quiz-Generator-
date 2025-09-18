@@ -346,10 +346,10 @@
                     <h3>Instructions</h3>
                     <ol>
                         <li>Prepare your document with MCQs in the correct format OR paste MCQs directly</li>
-                        <li>Each question should start with "Question:" or a number</li>
+                        <li>Each question should start with "Q:" or a number</li>
                         <li>Options should be prefixed with a), b), c), d)</li>
-                        <li>Correct answer should be indicated with "Correct Option: [letter])"</li>
-                        <li>Reasoning should be indicated with "Reason For Correct Option: [text]"</li>
+                        <li>Correct answer should be indicated with "Correct Answer: [letter]"</li>
+                        <li>Reasoning should be indicated with "Reasoning: [text]"</li>
                         <li>Upload your document or paste MCQs using the options below</li>
                         <li>Review the extracted MCQs and generate the JavaScript code</li>
                     </ol>
@@ -375,23 +375,23 @@
                 </div>
                 
                 <div class="text-input-area" id="text-input-section">
-                    <label for="mcq-textarea">Paste MCQs (up to 400)</label>
+                    <label for="mcq-textarea">Paste MCQs (up to 500)</label>
                     <textarea id="mcq-textarea" placeholder="Paste your MCQs here in the correct format. Example:
-Question: The filtration barrier in the renal corpuscle, responsible for preventing the passage of large proteins into the filtrate, is composed of three layers. Which of the following is NOT one of those layers?
-a) Fenestrated endothelium of the glomerular capillaries
-b) Basement membrane
-c) Podocyte foot processes
-d) Parietal epithelium of Bowman's capsule
-Correct Option: d) Parietal epithelium of Bowman's capsule
-Reason For Correct Option: The parietal epithelium of Bowman's capsule is a simple squamous epithelium that forms the outer wall of the corpuscle and plays no role in the selective filtration of blood. The actual filtration barrier consists of: 1) the fenestrated capillary endothelium, 2) the shared basement membrane, and 3) the filtration slits between the foot processes of the podocytes.
+Q: What is the capital of France?
+a) London
+b) Berlin
+c) Paris
+d) Madrid
+Correct Answer: c
+Reasoning: Paris is the capital and most populous city of France.
 
-Question: A patient presents with severe dehydration and highly concentrated urine. Which hormone is the body most likely secreting in high amounts to promote water reabsorption in the collecting ducts of the kidney?
-a) Atrial Natriuretic Peptide (ANP)
-b) Aldosterone
-c) Parathyroid Hormone (PTH)
-d) Antidiuretic Hormone (ADH)
-Correct Option: d) Antidiuretic Hormone (ADH)
-Reason For Correct Option: Antidiuretic Hormone (ADH), also known as vasopressin, is secreted by the posterior pituitary in response to high blood osmolarity (e.g., from dehydration). Its primary action is to insert aquaporin-2 water channels into the walls of the collecting ducts, allowing water reabsorption into the hypertonic renal medulla, resulting in concentrated urine."></textarea>
+Q: Which planet is known as the Red Planet?
+a) Venus
+b) Mars
+c) Jupiter
+d) Saturn
+Correct Answer: b
+Reasoning: Mars is often called the Red Planet due to its reddish appearance."></textarea>
                     <button class="btn btn-primary" id="parse-text-btn">
                         <i class="fas fa-paragraph"></i> Parse MCQs
                     </button>
@@ -404,7 +404,7 @@ Reason For Correct Option: Antidiuretic Hormone (ADH), also known as vasopressin
                 
                 <div class="form-group">
                     <label for="quiz-title">Quiz Title/Subject</label>
-                    <input type="text" id="quiz-title" value="Medical Physiology MCQs" placeholder="Enter quiz title/subject">
+                    <input type="text" id="quiz-title" value="English Grammar MCQs" placeholder="Enter quiz title/subject">
                 </div>
                 
                 <div class="form-group">
@@ -673,13 +673,13 @@ Reason For Correct Option: Antidiuretic Hormone (ADH), also known as vasopressin
                     const line = lines[i];
                     
                     // Detect question
-                    if (line.match(/^Question:|^\d+\./)) {
+                    if (line.match(/^(\d+\.|Q:)/)) {
                         if (currentQuestion) {
                             extractedData.push(currentQuestion);
                         }
                         
                         currentQuestion = {
-                            question: line.replace(/^(Question:|^\d+\.)\s*/, ''),
+                            question: line.replace(/^(\d+\.|Q:)\s*/, ''),
                             options: [],
                             correctAnswer: null,
                             reasoning: ''
@@ -690,16 +690,16 @@ Reason For Correct Option: Antidiuretic Hormone (ADH), also known as vasopressin
                         currentQuestion.options.push(line.replace(/^[a-d]\)\s*/, ''));
                     }
                     // Detect correct answer
-                    else if (line.match(/^Correct Option:/i) && currentQuestion) {
-                        const match = line.match(/Correct Option:\s*([a-d])/i);
+                    else if (line.match(/^Correct Answer:/i) && currentQuestion) {
+                        const match = line.match(/Correct Answer:\s*([a-d])/i);
                         if (match) {
                             // Convert a->0, b->1, c->2, d->3
                             currentQuestion.correctAnswer = match[1].charCodeAt(0) - 97;
                         }
                     }
                     // Detect reasoning
-                    else if (line.match(/^Reason For Correct Option:/i) && currentQuestion) {
-                        currentQuestion.reasoning = line.replace(/^Reason For Correct Option:\s*/i, '');
+                    else if (line.match(/^Reasoning:/i) && currentQuestion) {
+                        currentQuestion.reasoning = line.replace(/^Reasoning:\s*/i, '');
                     }
                     // If we're in a question and the line doesn't match any pattern, assume it's part of the question
                     else if (currentQuestion && !currentQuestion.options.length) {
@@ -750,18 +750,16 @@ Reason For Correct Option: Antidiuretic Hormone (ADH), also known as vasopressin
                     return;
                 }
                 
-                // Limit to 400 MCQs
-                if (extractedData.length > 400) {
-                    alert(`You have ${extractedData.length} MCQs. Only the first 400 will be processed.`);
-                    extractedData = extractedData.slice(0, 400);
+                // Limit to 500 MCQs
+                if (extractedData.length > 500) {
+                    alert(`You have ${extractedData.length} MCQs. Only the first 500 will be processed.`);
+                    extractedData = extractedData.slice(0, 500);
                 }
                 
                 const quizId = quizIdInput.value || 'PreMium-001';
-                const quizTitle = quizTitleInput.value || 'Medical Physiology MCQs';
+                const quizTitle = quizTitleInput.value || 'English Grammar MCQs';
                 const devPassword = devPasswordInput.value || 'Dev-PDA-001';
                 const studentPassword = studentPasswordInput.value || 'Dev-PDA-001';
-                const timePerQuestion = parseInt(timePerQuestionInput.value) || 60;
-                const totalTime = extractedData.length * timePerQuestion;
                 
                 // Generate the JavaScript code
                 let jsCode = `// Quiz data - ${quizTitle}
@@ -798,10 +796,6 @@ let questionTimeLeft;
 let totalTimeInterval;
 let questionTimeInterval;
 let studentData = {};
-
-// Set time per question (seconds)
-const TIME_PER_QUESTION = ${timePerQuestion};
-const TOTAL_QUIZ_TIME = ${totalTime}; // ${extractedData.length} questions × ${timePerQuestion} seconds
 
 // DOM elements
 const signinPage = document.getElementById('signin-page');
@@ -962,9 +956,9 @@ function startQuiz(quizId, userType) {
     userAnswers = Array(quizData.length).fill(null);
     outOfSyllabusQuestions = Array(quizData.length).fill(false);
     
-    // Set total time to TIME_PER_QUESTION per question
-    timeLeft = quizData.length * TIME_PER_QUESTION;
-    questionTimeLeft = TIME_PER_QUESTION;
+    // Set total time to 1 minute per question (40 minutes total)
+    timeLeft = quizData.length * 60;
+    questionTimeLeft = 60;
 
     showPage('quiz-page');
     initQuiz();
@@ -999,7 +993,7 @@ function updateQuestionTimer() {
         questionTimeLeft--;
         questionTimerEl.textContent = \`\${questionTimeLeft}\`;
     } else {
-        questionTimeLeft = TIME_PER_QUESTION;
+        questionTimeLeft = 60;
         navigateQuestion('next');
     }
 }
@@ -1057,7 +1051,7 @@ function renderQuestion() {
         optionsContainerEl.appendChild(optionEl);
     });
     
-    questionTimeLeft = TIME_PER_QUESTION;
+    questionTimeLeft = 60;
     questionTimerEl.textContent = \`\${questionTimeLeft}\`;
     renderQuestionNav();
 }
@@ -1167,7 +1161,7 @@ function restartTest() {
         currentQuestion = 0;
         userAnswers = Array(quizData.length).fill(null);
         outOfSyllabusQuestions = Array(quizData.length).fill(false);
-        timeLeft = quizData.length * TIME_PER_QUESTION;
+        timeLeft = quizData.length * 60;
         
         showPage('quiz-page');
         initQuiz();
@@ -1189,7 +1183,7 @@ function retakeIncorrect() {
     currentQuestion = 0;
     userAnswers = Array(quizData.length).fill(null);
     outOfSyllabusQuestions = Array(quizData.length).fill(false);
-    timeLeft = quizData.length * TIME_PER_QUESTION;
+    timeLeft = quizData.length * 60;
     
     showPage('quiz-page');
     initQuiz();
