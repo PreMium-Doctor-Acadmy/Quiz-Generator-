@@ -1,0 +1,1269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PreMium Doctor Academy - MCQ Extractor Tool</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.4.17/mammoth.browser.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
+    <style>
+        :root {
+            --primary-blue: #1a56db;
+            --secondary-blue: #0ea5e9;
+            --dark-blue: #1e3a8a;
+            --light-blue: #dbeafe;
+            --accent-green: #10b981;
+            --accent-orange: #f59e0b;
+            --accent-red: #ef4444;
+            --gradient-blue: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+            --gradient-green: linear-gradient(135deg, var(--accent-green), #34d399);
+            --gradient-orange: linear-gradient(135deg, var(--accent-orange), #f97316);
+            --gradient-red: linear-gradient(135deg, var(--accent-red), #f87171);
+            --shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+            --shadow-lg: 0 3px 8px rgba(0, 0, 0, 0.12);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 8px;
+            color: #1e3a8a;
+            font-size: 11px;
+            overflow-x: hidden;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 900px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 12px;
+        }
+
+        .logo h1 {
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: var(--dark-blue);
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.08);
+            margin-bottom: 2px;
+        }
+
+        .logo p {
+            color: var(--primary-blue);
+            font-weight: 600;
+            font-size: 0.7rem;
+        }
+
+        header {
+            background: linear-gradient(135deg, #1e3a8a, #1a56db);
+            color: white;
+            padding: 15px;
+            text-align: center;
+            border-radius: 6px;
+            margin-bottom: 15px;
+        }
+
+        h1 {
+            font-size: 0.9rem;
+            margin-bottom: 8px;
+            color: #ffd700;
+        }
+
+        .subtitle {
+            font-size: 0.6rem;
+            line-height: 1.4;
+            text-align: justify;
+        }
+
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .panel {
+            background: white;
+            border-radius: 6px;
+            padding: 12px;
+            box-shadow: var(--shadow-lg);
+            width: 100%;
+        }
+
+        .form-group {
+            margin-bottom: 8px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 2px;
+            font-weight: 600;
+            color: var(--dark-blue);
+            font-size: 0.7rem;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 6px 9px;
+            border: 1.5px solid var(--light-blue);
+            border-radius: 5px;
+            font-size: 0.7rem;
+            background: #f8fafc;
+            transition: all 0.2s;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 2px rgba(26, 86, 219, 0.15);
+        }
+
+        textarea {
+            min-height: 150px;
+            font-family: monospace;
+            resize: vertical;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 6px 10px;
+            border: none;
+            border-radius: 5px;
+            font-weight: 700;
+            font-size: 0.7rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+            gap: 4px;
+            width: 100%;
+        }
+
+        .btn-primary {
+            background: var(--gradient-blue);
+            color: white;
+            box-shadow: var(--shadow);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 3px 6px rgba(26, 86, 219, 0.2);
+        }
+
+        .btn-purple {
+            background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+            color: white;
+            box-shadow: var(--shadow);
+        }
+
+        .btn-purple:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 3px 6px rgba(139, 92, 246, 0.2);
+        }
+
+        .btn-green {
+            background: var(--gradient-green);
+            color: white;
+            box-shadow: var(--shadow);
+        }
+
+        .btn-green:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 3px 6px rgba(16, 185, 129, 0.2);
+        }
+
+        .btn-red {
+            background: var(--gradient-red);
+            color: white;
+            box-shadow: var(--shadow);
+        }
+
+        .btn-red:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 3px 6px rgba(239, 68, 68, 0.2);
+        }
+
+        .file-upload {
+            border: 2px dashed var(--primary-blue);
+            padding: 20px;
+            text-align: center;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            background: #f0f4ff;
+            cursor: pointer;
+        }
+
+        .file-upload i {
+            font-size: 30px;
+            color: var(--primary-blue);
+            margin-bottom: 10px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .preview-box {
+            border: 1px solid var(--light-blue);
+            border-radius: 8px;
+            padding: 10px;
+            margin-top: 15px;
+            background: white;
+            max-height: 300px;
+            overflow-y: auto;
+            font-size: 0.7rem;
+        }
+
+        .preview-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--primary-blue);
+            font-size: 0.8rem;
+        }
+
+        .mcq-item {
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .mcq-question {
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: var(--dark-blue);
+        }
+
+        .mcq-options {
+            padding-left: 15px;
+        }
+
+        .mcq-option {
+            margin-bottom: 3px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 5px;
+            margin-top: 15px;
+        }
+
+        .instructions {
+            background: #e9f7ff;
+            padding: 10px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            font-size: 0.7rem;
+        }
+
+        .instructions h3 {
+            color: var(--primary-blue);
+            margin-bottom: 8px;
+            font-size: 0.8rem;
+        }
+
+        .instructions ol {
+            padding-left: 15px;
+        }
+
+        .instructions li {
+            margin-bottom: 5px;
+            line-height: 1.4;
+        }
+
+        .file-type-selector {
+            display: flex;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            overflow: hidden;
+            border: 1.5px solid var(--light-blue);
+        }
+
+        .file-type-btn {
+            flex: 1;
+            padding: 6px;
+            text-align: center;
+            background: #f8fafc;
+            cursor: pointer;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+
+        .file-type-btn.active {
+            background: var(--primary-blue);
+            color: white;
+        }
+
+        .text-input-area {
+            display: none;
+            margin-bottom: 15px;
+        }
+
+        .text-input-area.active {
+            display: block;
+        }
+
+        @media (min-width: 768px) {
+            .main-content {
+                flex-direction: row;
+            }
+            
+            .left-panel, .right-panel {
+                width: 48%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">
+            <h1>PreMium Doctor Academy</h1>
+            <p>Excellence in Educational Assessment</p>
+        </div>
+        
+        <header>
+            <h1>MCQ Extractor Tool</h1>
+            <p class="subtitle">Upload PDF or Word documents with MCQs, or paste MCQs directly to generate JavaScript code for your quiz</p>
+        </header>
+        
+        <div class="main-content">
+            <div class="panel left-panel">
+                <div class="instructions">
+                    <h3>Instructions</h3>
+                    <ol>
+                        <li>Prepare your document with MCQs in the correct format OR paste MCQs directly</li>
+                        <li>Each question should start with "Q:" or a number</li>
+                        <li>Options should be prefixed with a), b), c), d)</li>
+                        <li>Correct answer should be indicated with "Correct Answer: [letter]"</li>
+                        <li>Reasoning should be indicated with "Reasoning: [text]"</li>
+                        <li>Upload your document or paste MCQs using the options below</li>
+                        <li>Review the extracted MCQs and generate the JavaScript code</li>
+                    </ol>
+                </div>
+                
+                <div class="form-group">
+                    <label>Select Input Method</label>
+                    <div class="file-type-selector">
+                        <div class="file-type-btn active" id="docx-btn">Word</div>
+                        <div class="file-type-btn" id="pdf-btn">PDF</div>
+                        <div class="file-type-btn" id="text-btn">Text</div>
+                    </div>
+                </div>
+                
+                <div class="form-group" id="file-upload-section">
+                    <label for="docx-file">Upload Document</label>
+                    <div class="file-upload" id="drop-zone">
+                        <i class="fas fa-file-word" id="file-icon"></i>
+                        <p>Click to upload or drag and drop</p>
+                        <p class="subtitle" id="file-type-text">Only .docx files are accepted</p>
+                        <input type="file" id="docx-file" accept=".docx" class="hidden">
+                    </div>
+                </div>
+                
+                <div class="text-input-area" id="text-input-section">
+                    <label for="mcq-textarea">Paste MCQs (up to 500)</label>
+                    <textarea id="mcq-textarea" placeholder="Paste your MCQs here in the correct format. Example:
+Q: What is the capital of France?
+a) London
+b) Berlin
+c) Paris
+d) Madrid
+Correct Answer: c
+Reasoning: Paris is the capital and most populous city of France.
+
+Q: Which planet is known as the Red Planet?
+a) Venus
+b) Mars
+c) Jupiter
+d) Saturn
+Correct Answer: b
+Reasoning: Mars is often called the Red Planet due to its reddish appearance."></textarea>
+                    <button class="btn btn-primary" id="parse-text-btn">
+                        <i class="fas fa-paragraph"></i> Parse MCQs
+                    </button>
+                </div>
+                
+                <div class="form-group">
+                    <label for="quiz-id">Quiz ID</label>
+                    <input type="text" id="quiz-id" value="PreMium-001" placeholder="Enter quiz ID">
+                </div>
+                
+                <div class="form-group">
+                    <label for="quiz-title">Quiz Title/Subject</label>
+                    <input type="text" id="quiz-title" value="English Grammar MCQs" placeholder="Enter quiz title/subject">
+                </div>
+                
+                <div class="form-group">
+                    <label for="dev-password">Developer Password</label>
+                    <input type="text" id="dev-password" value="Dev-PDA-001" placeholder="Enter developer password">
+                </div>
+                
+                <div class="form-group">
+                    <label for="student-password">Student Password (Quiz Access Code)</label>
+                    <input type="text" id="student-password" value="Dev-PDA-001" placeholder="Enter student password">
+                </div>
+                
+                <div class="form-group">
+                    <label for="time-per-question">Time per Question (seconds)</label>
+                    <input type="number" id="time-per-question" value="60" min="10">
+                </div>
+                
+                <button class="btn btn-primary" id="process-btn">
+                    <i class="fas fa-cogs"></i> Generate JavaScript Code
+                </button>
+                
+                <div class="preview-box">
+                    <div class="preview-title">Extracted MCQs Preview</div>
+                    <div id="mcq-preview"></div>
+                </div>
+            </div>
+            
+            <div class="panel right-panel">
+                <div class="form-group">
+                    <label for="js-output">Generated JavaScript Code</label>
+                    <textarea id="js-output" readonly placeholder="The generated JavaScript code will appear here..."></textarea>
+                </div>
+                
+                <div class="action-buttons">
+                    <button class="btn btn-green" id="copy-btn">
+                        <i class="fas fa-copy"></i> Copy Code
+                    </button>
+                    <button class="btn btn-red" id="download-btn">
+                        <i class="fas fa-download"></i> Download Code
+                    </button>
+                </div>
+                
+                <div class="instructions">
+                    <h3>How to Use the Generated Code</h3>
+                    <ol>
+                        <li>Copy the generated JavaScript code</li>
+                        <li>Create an HTML file with your quiz layout</li>
+                        <li>Replace the quiz data in your JavaScript with the generated code</li>
+                        <li>Adjust the timer settings if needed</li>
+                        <li>Test your quiz to ensure everything works correctly</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Set up PDF.js worker
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js';
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const fileInput = document.getElementById('docx-file');
+            const dropZone = document.getElementById('drop-zone');
+            const processBtn = document.getElementById('process-btn');
+            const jsOutput = document.getElementById('js-output');
+            const copyBtn = document.getElementById('copy-btn');
+            const downloadBtn = document.getElementById('download-btn');
+            const mcqPreview = document.getElementById('mcq-preview');
+            const quizIdInput = document.getElementById('quiz-id');
+            const quizTitleInput = document.getElementById('quiz-title');
+            const timePerQuestionInput = document.getElementById('time-per-question');
+            const devPasswordInput = document.getElementById('dev-password');
+            const studentPasswordInput = document.getElementById('student-password');
+            const docxBtn = document.getElementById('docx-btn');
+            const pdfBtn = document.getElementById('pdf-btn');
+            const textBtn = document.getElementById('text-btn');
+            const fileIcon = document.getElementById('file-icon');
+            const fileTypeText = document.getElementById('file-type-text');
+            const fileUploadSection = document.getElementById('file-upload-section');
+            const textInputSection = document.getElementById('text-input-section');
+            const mcqTextarea = document.getElementById('mcq-textarea');
+            const parseTextBtn = document.getElementById('parse-text-btn');
+            
+            let extractedData = [];
+            let currentFileType = 'docx'; // Default file type
+            
+            // Set up file type selection
+            docxBtn.addEventListener('click', () => {
+                setFileType('docx');
+            });
+            
+            pdfBtn.addEventListener('click', () => {
+                setFileType('pdf');
+            });
+            
+            textBtn.addEventListener('click', () => {
+                setFileType('text');
+            });
+            
+            function setFileType(type) {
+                currentFileType = type;
+                if (type === 'docx') {
+                    docxBtn.classList.add('active');
+                    pdfBtn.classList.remove('active');
+                    textBtn.classList.remove('active');
+                    fileInput.accept = '.docx';
+                    fileIcon.className = 'fas fa-file-word';
+                    fileTypeText.textContent = 'Only .docx files are accepted';
+                    fileUploadSection.style.display = 'block';
+                    textInputSection.classList.remove('active');
+                } else if (type === 'pdf') {
+                    docxBtn.classList.remove('active');
+                    pdfBtn.classList.add('active');
+                    textBtn.classList.remove('active');
+                    fileInput.accept = '.pdf';
+                    fileIcon.className = 'fas fa-file-pdf';
+                    fileTypeText.textContent = 'Only .pdf files are accepted';
+                    fileUploadSection.style.display = 'block';
+                    textInputSection.classList.remove('active');
+                } else {
+                    docxBtn.classList.remove('active');
+                    pdfBtn.classList.remove('active');
+                    textBtn.classList.add('active');
+                    fileUploadSection.style.display = 'none';
+                    textInputSection.classList.add('active');
+                }
+            }
+            
+            // Parse text button event listener
+            parseTextBtn.addEventListener('click', () => {
+                const text = mcqTextarea.value;
+                if (!text.trim()) {
+                    alert('Please paste some MCQs in the text area.');
+                    return;
+                }
+                parseMCQs(text);
+            });
+            
+            // Drag and drop functionality
+            dropZone.addEventListener('click', () => fileInput.click());
+            
+            dropZone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                dropZone.style.background = '#e0e7ff';
+            });
+            
+            dropZone.addEventListener('dragleave', () => {
+                dropZone.style.background = '#f0f4ff';
+            });
+            
+            dropZone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                dropZone.style.background = '#f0f4ff';
+                
+                if (e.dataTransfer.files.length) {
+                    fileInput.files = e.dataTransfer.files;
+                    handleFileUpload(e.dataTransfer.files[0]);
+                }
+            });
+            
+            fileInput.addEventListener('change', (e) => {
+                if (e.target.files.length) {
+                    handleFileUpload(e.target.files[0]);
+                }
+            });
+            
+            processBtn.addEventListener('click', processMCQs);
+            copyBtn.addEventListener('click', copyToClipboard);
+            downloadBtn.addEventListener('click', downloadCode);
+            
+            function handleFileUpload(file) {
+                // Validate file type
+                if (currentFileType === 'docx' && !file.name.endsWith('.docx')) {
+                    alert('Please upload a .docx file');
+                    return;
+                }
+                
+                if (currentFileType === 'pdf' && !file.name.endsWith('.pdf')) {
+                    alert('Please upload a .pdf file');
+                    return;
+                }
+                
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    const arrayBuffer = e.target.result;
+                    
+                    if (currentFileType === 'docx') {
+                        processDocxFile(arrayBuffer);
+                    } else {
+                        processPdfFile(arrayBuffer);
+                    }
+                };
+                
+                reader.readAsArrayBuffer(file);
+            }
+            
+            function processDocxFile(arrayBuffer) {
+                mammoth.extractRawText({ arrayBuffer })
+                    .then(result => {
+                        const text = result.value;
+                        parseMCQs(text);
+                    })
+                    .catch(err => {
+                        console.error('Error extracting text:', err);
+                        alert('Error processing document. Please check the console for details.');
+                    });
+            }
+            
+            function processPdfFile(arrayBuffer) {
+                // Use PDF.js to extract text from PDF
+                const loadingTask = pdfjsLib.getDocument({ data: arrayBuffer });
+                
+                loadingTask.promise.then(pdf => {
+                    let text = '';
+                    const numPages = pdf.numPages;
+                    const extractPageText = pageNum => {
+                        return pdf.getPage(pageNum).then(page => {
+                            return page.getTextContent().then(textContent => {
+                                let lastY = -1;
+                                let pageText = '';
+                                
+                                // Sort text items by Y position
+                                const items = textContent.items;
+                                for (let i = 0; i < items.length; i++) {
+                                    const item = items[i];
+                                    if (lastY !== -1 && Math.abs(lastY - item.transform[5]) > 5) {
+                                        pageText += '\n';
+                                    }
+                                    pageText += item.str + ' ';
+                                    lastY = item.transform[5];
+                                }
+                                
+                                return pageText;
+                            });
+                        });
+                    };
+                    
+                    // Extract text from all pages sequentially
+                    const extractAllPages = async () => {
+                        for (let i = 1; i <= numPages; i++) {
+                            const pageText = await extractPageText(i);
+                            text += pageText + '\n\n';
+                        }
+                        parseMCQs(text);
+                    };
+                    
+                    extractAllPages();
+                }).catch(err => {
+                    console.error('Error extracting text from PDF:', err);
+                    alert('Error processing PDF. Please check the console for details.');
+                });
+            }
+            
+            function parseMCQs(text) {
+                // Reset extracted data
+                extractedData = [];
+                mcqPreview.innerHTML = '';
+                
+                // Split text into lines and remove empty lines
+                const lines = text.split('\n').map(line => line.trim()).filter(line => line);
+                
+                let currentQuestion = null;
+                
+                for (let i = 0; i < lines.length; i++) {
+                    const line = lines[i];
+                    
+                    // Detect question
+                    if (line.match(/^(\d+\.|Q:)/)) {
+                        if (currentQuestion) {
+                            extractedData.push(currentQuestion);
+                        }
+                        
+                        currentQuestion = {
+                            question: line.replace(/^(\d+\.|Q:)\s*/, ''),
+                            options: [],
+                            correctAnswer: null,
+                            reasoning: ''
+                        };
+                    }
+                    // Detect options (a), b), etc.)
+                    else if (line.match(/^[a-d]\)/) && currentQuestion) {
+                        currentQuestion.options.push(line.replace(/^[a-d]\)\s*/, ''));
+                    }
+                    // Detect correct answer
+                    else if (line.match(/^Correct Answer:/i) && currentQuestion) {
+                        const match = line.match(/Correct Answer:\s*([a-d])/i);
+                        if (match) {
+                            // Convert a->0, b->1, c->2, d->3
+                            currentQuestion.correctAnswer = match[1].charCodeAt(0) - 97;
+                        }
+                    }
+                    // Detect reasoning
+                    else if (line.match(/^Reasoning:/i) && currentQuestion) {
+                        currentQuestion.reasoning = line.replace(/^Reasoning:\s*/i, '');
+                    }
+                    // If we're in a question and the line doesn't match any pattern, assume it's part of the question
+                    else if (currentQuestion && !currentQuestion.options.length) {
+                        currentQuestion.question += ' ' + line;
+                    }
+                }
+                
+                // Push the last question
+                if (currentQuestion) {
+                    extractedData.push(currentQuestion);
+                }
+                
+                // Display preview
+                renderPreview();
+            }
+            
+            function renderPreview() {
+                mcqPreview.innerHTML = '';
+                
+                if (extractedData.length === 0) {
+                    mcqPreview.innerHTML = '<p>No MCQs extracted. Please check your document format.</p>';
+                    return;
+                }
+                
+                extractedData.forEach((mcq, index) => {
+                    const mcqEl = document.createElement('div');
+                    mcqEl.className = 'mcq-item';
+                    
+                    let optionsHtml = '';
+                    mcq.options.forEach((option, optIndex) => {
+                        optionsHtml += `<div class="mcq-option"><strong>${String.fromCharCode(97 + optIndex)})</strong> ${option}</div>`;
+                    });
+                    
+                    mcqEl.innerHTML = `
+                        <div class="mcq-question">${index + 1}. ${mcq.question}</div>
+                        <div class="mcq-options">${optionsHtml}</div>
+                        <div><strong>Correct Answer:</strong> ${String.fromCharCode(97 + mcq.correctAnswer)}</div>
+                        <div><strong>Reasoning:</strong> ${mcq.reasoning}</div>
+                    `;
+                    
+                    mcqPreview.appendChild(mcqEl);
+                });
+            }
+            
+            function processMCQs() {
+                if (extractedData.length === 0) {
+                    alert('No MCQs to process. Please upload a document or paste MCQs first.');
+                    return;
+                }
+                
+                // Limit to 500 MCQs
+                if (extractedData.length > 500) {
+                    alert(`You have ${extractedData.length} MCQs. Only the first 500 will be processed.`);
+                    extractedData = extractedData.slice(0, 500);
+                }
+                
+                const quizId = quizIdInput.value || 'PreMium-001';
+                const quizTitle = quizTitleInput.value || 'English Grammar MCQs';
+                const devPassword = devPasswordInput.value || 'Dev-PDA-001';
+                const studentPassword = studentPasswordInput.value || 'Dev-PDA-001';
+                const timePerQuestion = parseInt(timePerQuestionInput.value) || 60;
+                const totalTime = extractedData.length * timePerQuestion;
+                
+                // Generate the JavaScript code
+                let jsCode = `// Quiz data - ${quizTitle}
+const quizData_${quizId.replace(/-/g, '_')} = [\n`;
+                
+                extractedData.forEach((mcq, index) => {
+                    jsCode += `    {\n`;
+                    jsCode += `        question: "${mcq.question.replace(/"/g, '\\"')}",\n`;
+                    jsCode += `        options: [\n`;
+                    
+                    mcq.options.forEach(option => {
+                        jsCode += `            "${option.replace(/"/g, '\\"')}",\n`;
+                    });
+                    
+                    jsCode += `        ],\n`;
+                    jsCode += `        correctAnswer: ${mcq.correctAnswer},\n`;
+                    jsCode += `        reasoning: "${mcq.reasoning.replace(/"/g, '\\"')}"\n`;
+                    jsCode += `    }${index < extractedData.length - 1 ? ',' : ''}\n`;
+                });
+                
+                jsCode += `];
+
+// Global state variables
+const QUIZ_ACCESS_CODE = "${studentPassword}";
+const DEV_ACCESS_CODE = "${devPassword}";
+
+let currentQuizId = '${quizId}'; // Default quiz ID
+let quizData = quizData_${quizId.replace(/-/g, '_')};
+let currentQuestion = 0;
+let userAnswers = Array(quizData.length).fill(null);
+let outOfSyllabusQuestions = Array(quizData.length).fill(false);
+let timeLeft;
+let questionTimeLeft;
+let totalTimeInterval;
+let questionTimeInterval;
+let studentData = {};
+
+// Set time per question (seconds)
+const TIME_PER_QUESTION = ${timePerQuestion};
+const TOTAL_QUIZ_TIME = ${totalTime}; // ${extractedData.length} questions × ${timePerQuestion} seconds
+
+// DOM elements
+const signinPage = document.getElementById('signin-page');
+const registrationPage = document.getElementById('registration-page');
+const paymentPage = document.getElementById('payment-page');
+const quizAccessPage = document.getElementById('quiz-access-page');
+const quizPage = document.getElementById('quiz-page');
+const resultsPage = document.getElementById('results-page');
+const allMcqsPage = document.getElementById('all-mcqs-page');
+const questionNavEl = document.getElementById('question-nav');
+const questionTextEl = document.getElementById('question-text');
+const optionsContainerEl = document.getElementById('options-container');
+const reasoningEl = document.getElementById('reasoning');
+const reasoningTextEl = document.getElementById('reasoning-text');
+const quizTitleEl = document.getElementById('quiz-title');
+const totalTimerEl = document.getElementById('timer');
+const questionTimerEl = document.getElementById('question-timer');
+const quizProgressEl = document.getElementById('quiz-progress');
+const studentInfoTable = document.getElementById('student-info-table');
+const quizResultsTable = document.getElementById('quiz-results-table');
+const allMcqsList = document.getElementById('all-mcqs-list');
+const devPasswordInput = document.getElementById('developerPassword');
+const devErrorBox = document.getElementById('dev-error-box');
+const quizAccessCodeInput = document.getElementById('quizAccessCode');
+const quizAccessErrorBox = document.getElementById('quiz-error-box');
+const quizAccessFinalInput = document.getElementById('quizAccessFinal');
+const finalQuizErrorBox = document.getElementById('final-quiz-error-box');
+const toggleDevPasswordIcon = document.getElementById('toggleDeveloperPassword');
+const toggleQuizCodeIcon = document.getElementById('toggleQuizAccessCode');
+const toggleFinalQuizIcon = document.getElementById('toggleQuizAccessFinal');
+
+// Event listeners for password visibility
+toggleDevPasswordIcon.addEventListener('click', () => togglePasswordVisibility('developerPassword', 'toggleDeveloperPassword'));
+toggleQuizCodeIcon.addEventListener('click', () => togglePasswordVisibility('quizAccessCode', 'toggleQuizAccessCode'));
+toggleFinalQuizIcon.addEventListener('click', () => togglePasswordVisibility('quizAccessFinal', 'toggleQuizAccessFinal'));
+
+// Functions
+function showPage(pageId) {
+    const pages = document.querySelectorAll('.page');
+    pages.forEach(page => page.classList.remove('active'));
+    document.getElementById(pageId).classList.add('active');
+}
+
+function togglePasswordVisibility(inputID, iconID) {
+    const passwordInput = document.getElementById(inputID);
+    const toggleIcon = document.getElementById(iconID);
+    
+    if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        toggleIcon.classList.remove('fa-eye-slash');
+        toggleIcon.classList.add('fa-eye');
+    } else {
+        passwordInput.type = 'password';
+        toggleIcon.classList.remove('fa-eye');
+        toggleIcon.classList.add('fa-eye-slash');
+    }
+}
+
+function showQuizAccessForm() {
+    document.getElementById('quiz-access-form').style.display = 'flex';
+    document.getElementById('developer-access-form').style.display = 'none';
+}
+
+function showDeveloperAccessForm() {
+    document.getElementById('developer-access-form').style.display = 'flex';
+    document.getElementById('quiz-access-form').style.display = 'none';
+}
+
+function showRegistrationPage() {
+    showPage('registration-page');
+}
+
+function checkDeveloperPassword() {
+    if (devPasswordInput.value === DEV_ACCESS_CODE) {
+        devErrorBox.style.display = 'none';
+        startQuiz('${quizId}', 'Developer');
+    } else {
+        devErrorBox.style.display = 'block';
+    }
+}
+
+function checkQuizAccessCode() {
+    if (quizAccessCodeInput.value === QUIZ_ACCESS_CODE) {
+        quizAccessErrorBox.style.display = 'none';
+        showPage('quiz-access-page');
+    } else {
+        quizAccessErrorBox.style.display = 'block';
+    }
+}
+
+function accessQuiz() {
+    if (quizAccessFinalInput.value === QUIZ_ACCESS_CODE) {
+        finalQuizErrorBox.style.display = 'none';
+        startQuiz('${quizId}', 'Student');
+    } else {
+        finalQuizErrorBox.style.display = 'block';
+    }
+}
+
+function validateRegistrationForm() {
+    const fields = ['studentName', 'fatherName', 'email', 'mobile', 'testType'];
+    for (const field of fields) {
+        if (document.getElementById(field).value.trim() === '') {
+            alert('Please fill in all the registration details.');
+            return;
+        }
+    }
+    
+    studentData = {
+        'Student Name': document.getElementById('studentName').value,
+        'Father Name': document.getElementById('fatherName').value,
+        'Email Address': document.getElementById('email').value,
+        'Mobile Number': document.getElementById('mobile').value,
+        'Test Type': document.getElementById('testType').value
+    };
+
+    // Save to local storage
+    localStorage.setItem('studentData', JSON.stringify(studentData));
+    
+    showPage('payment-page');
+}
+
+function submitPayment() {
+    // Collect the data from the form fields
+    const transactionId = document.getElementById('transactionId').value;
+    const accountHolderName = document.getElementById('accountHolderName').value;
+    const amountSent = document.getElementById('amountSent').value;
+
+    // Check if the acknowledgment box is checked
+    if (!document.getElementById('acknowledgment').checked) {
+        alert('Please check the acknowledgment box to proceed.');
+        return;
+    }
+
+    // Check for empty fields.
+    if (!transactionId || !accountHolderName || !amountSent) {
+        alert('Please ensure all required fields are filled out.');
+        return;
+    }
+
+    // Save payment data to local storage
+    const paymentData = {
+        transactionId: transactionId,
+        accountHolderName: accountHolderName,
+        amountSent: amountSent
+    };
+    
+    localStorage.setItem('paymentData', JSON.stringify(paymentData));
+    
+    alert("Payment details submitted successfully! You will receive your Quiz Access Code shortly.");
+    showPage('quiz-access-page');
+}
+
+function startQuiz(quizId, userType) {
+    currentQuizId = quizId;
+    quizData = quizData_${quizId.replace(/-/g, '_')};
+    currentQuestion = 0;
+    userAnswers = Array(quizData.length).fill(null);
+    outOfSyllabusQuestions = Array(quizData.length).fill(false);
+    
+    // Set total time to TIME_PER_QUESTION per question
+    timeLeft = quizData.length * TIME_PER_QUESTION;
+    questionTimeLeft = TIME_PER_QUESTION;
+
+    showPage('quiz-page');
+    initQuiz();
+}
+
+function initQuiz() {
+    quizTitleEl.textContent = \`Test - ID: \${currentQuizId}\`;
+    renderQuestionNav();
+    renderQuestion();
+
+    if (totalTimeInterval) clearInterval(totalTimeInterval);
+    if (questionTimeInterval) clearInterval(questionTimeInterval);
+    
+    totalTimeInterval = setInterval(updateTotalTimer, 1000);
+    questionTimeInterval = setInterval(updateQuestionTimer, 1000);
+}
+
+function updateTotalTimer() {
+    if (timeLeft > 0) {
+        timeLeft--;
+        const minutes = Math.floor(timeLeft / 60);
+        const seconds = timeLeft % 60;
+        totalTimerEl.textContent = \`\${String(minutes).padStart(2, '0')}:\${String(seconds).padStart(2, '0')}\`;
+    } else {
+        clearInterval(totalTimeInterval);
+        submitTest();
+    }
+}
+
+function updateQuestionTimer() {
+    if (questionTimeLeft > 0) {
+        questionTimeLeft--;
+        questionTimerEl.textContent = \`\${questionTimeLeft}\`;
+    } else {
+        questionTimeLeft = TIME_PER_QUESTION;
+        navigateQuestion('next');
+    }
+}
+
+function renderQuestionNav() {
+    questionNavEl.innerHTML = '';
+    quizData.forEach((_, index) => {
+        const navItem = document.createElement('div');
+        navItem.classList.add('question-nav-item');
+        navItem.textContent = index + 1;
+        navItem.onclick = () => navigateQuestion(index);
+        
+        if (index === currentQuestion) {
+            navItem.classList.add('current');
+        } else if (userAnswers[index] !== null) {
+            navItem.classList.add('solved');
+        } else if (outOfSyllabusQuestions[index]) {
+            navItem.classList.add('out-of-syllabus');
+        } else {
+            navItem.classList.add('visited');
+        }
+        
+        questionNavEl.appendChild(navItem);
+    });
+    updateProgressBar();
+}
+
+function updateProgressBar() {
+    const solvedCount = userAnswers.filter(answer => answer !== null).length;
+    const progress = (solvedCount / quizData.length) * 100;
+    quizProgressEl.style.width = \`\${progress}%\`;
+}
+
+function renderQuestion() {
+    reasoningEl.style.display = 'none';
+    const question = quizData[currentQuestion];
+    questionTextEl.textContent = \`\${currentQuestion + 1}. \${question.question}\`;
+    
+    optionsContainerEl.innerHTML = '';
+    question.options.forEach((option, index) => {
+        const optionEl = document.createElement('div');
+        optionEl.classList.add('option');
+        optionEl.textContent = option;
+        
+        // Add click listener only if not already answered
+        if (userAnswers[currentQuestion] === null) {
+            optionEl.onclick = () => selectOption(index);
+        } else {
+            // Show visual feedback for already answered questions
+            if (index === userAnswers[currentQuestion]) {
+                optionEl.classList.add(userAnswers[currentQuestion] === question.correctAnswer ? 'correct' : 'incorrect');
+            }
+        }
+        
+        optionsContainerEl.appendChild(optionEl);
+    });
+    
+    questionTimeLeft = TIME_PER_QUESTION;
+    questionTimerEl.textContent = \`\${questionTimeLeft}\`;
+    renderQuestionNav();
+}
+
+function selectOption(optionIndex) {
+    const question = quizData[currentQuestion];
+    userAnswers[currentQuestion] = optionIndex;
+    
+    // Apply visual feedback
+    const options = optionsContainerEl.querySelectorAll('.option');
+    options.forEach((option, index) => {
+        option.onclick = null; // Disable further clicks
+        if (index === question.correctAnswer) {
+            option.classList.add('correct');
+        } else if (index === optionIndex) {
+            option.classList.add('incorrect');
+        }
+    });
+
+    renderQuestionNav();
+}
+
+function navigateQuestion(direction) {
+    if (direction === 'next') {
+        currentQuestion = (currentQuestion + 1) % quizData.length;
+    } else if (direction === 'prev') {
+        currentQuestion = (currentQuestion - 1 + quizData.length) % quizData.length;
+    } else if (direction === 'skip') {
+        // Do nothing, just move to the next question
+        currentQuestion = (currentQuestion + 1) % quizData.length;
+    } else {
+        currentQuestion = direction;
+    }
+    renderQuestion();
+}
+
+function toggleReasoning() {
+    const question = quizData[currentQuestion];
+    if (reasoningEl.style.display === 'block') {
+        reasoningEl.style.display = 'none';
+    } else {
+        reasoningTextEl.textContent = question.reasoning;
+        reasoningEl.style.display = 'block';
+    }
+}
+
+function markOutOfSyllabus() {
+    outOfSyllabusQuestions[currentQuestion] = true;
+    userAnswers[currentQuestion] = null;
+    renderQuestionNav();
+    navigateQuestion('next');
+}
+
+function submitTest() {
+    if (confirm('Are you sure you want to submit the quiz?')) {
+        clearInterval(totalTimeInterval);
+        clearInterval(questionTimeInterval);
+
+        let correct = 0;
+        let incorrect = 0;
+        let unanswered = 0;
+        let outOfSyllabus = 0;
+
+        quizData.forEach((question, index) => {
+            if (outOfSyllabusQuestions[index]) {
+                outOfSyllabus++;
+            } else if (userAnswers[index] === null) {
+                unanswered++;
+            } else if (userAnswers[index] === question.correctAnswer) {
+                correct++;
+            } else {
+                incorrect++;
+            }
+        });
+
+        const totalQuestions = quizData.length;
+        const totalScore = (correct * 4) - (incorrect * 1);
+
+        // Load student data from local storage
+        const savedStudentData = JSON.parse(localStorage.getItem('studentData') || '{}');
+        
+        // Populate student info table
+        let studentInfoHtml = '';
+        for (const [key, value] of Object.entries(savedStudentData)) {
+            studentInfoHtml += \`<tr><th>\${key}</th><td>\${value}</td></tr>\`;
+        }
+        studentInfoTable.innerHTML = studentInfoHtml;
+
+        // Populate quiz results table
+        quizResultsTable.innerHTML = \`
+            <tr><th>Total Questions</th><td>\${totalQuestions}</td></tr>
+            <tr><th>Correct Answers</th><td>\${correct}</td></tr>
+            <tr><th>Incorrect Answers</th><td>\${incorrect}</td></tr>
+            <tr><th>Unanswered</th><td>\${unanswered}</td></tr>
+            <tr><th>Out of Syllabus</th><td>\${outOfSyllabus}</td></tr>
+            <tr><th>Your Score</th><td>\${totalScore} / \${totalQuestions * 4}</td></tr>
+        \`;
+
+        showPage('results-page');
+    }
+}
+
+function restartTest() {
+    if (confirm('Are you sure you want to retake the full test? Your current progress will be lost.')) {
+        // Reset quiz data and state
+        quizData = quizData_${quizId.replace(/-/g, '_')};
+        currentQuestion = 0;
+        userAnswers = Array(quizData.length).fill(null);
+        outOfSyllabusQuestions = Array(quizData.length).fill(false);
+        timeLeft = quizData.length * TIME_PER_QUESTION;
+        
+        showPage('quiz-page');
+        initQuiz();
+    }
+}
+
+function retakeIncorrect() {
+    const incorrectQuestions = quizData.filter((question, index) => 
+        !outOfSyllabusQuestions[index] && 
+        userAnswers[index] !== null && 
+        userAnswers[index] !== question.correctAnswer);
+    
+    if (incorrectQuestions.length === 0) {
+        alert('You have no incorrect questions to retake!');
+        return;
+    }
+    
+    quizData = incorrectQuestions;
+    currentQuestion = 0;
+    userAnswers = Array(quizData.length).fill(null);
+    outOfSyllabusQuestions = Array(quizData.length).fill(false);
+    timeLeft = quizData.length * TIME_PER_QUESTION;
+    
+    showPage('quiz-page');
+    initQuiz();
+}
+
+function viewAllMcqs() {
+    allMcqsList.innerHTML = '';
+    quizData_${quizId.replace(/-/g, '_')}.forEach((question, index) => {
+        const mcqItem = document.createElement('div');
+        mcqItem.classList.add('all-mcq-item');
+        mcqItem.innerHTML = \`
+            <div class="question-text">\${index + 1}. \${question.question}</div>
+            <div class="all-mcq-options">
+                \${question.options.map((option, optIndex) => \`
+                    <div class="all-mcq-option \${optIndex === question.correctAnswer ? 'correct' : ''}">
+                        \${option}
+                    </div>
+                \`).join('')}
+            </div>
+            <div class="all-mcq-reasoning">
+                <strong>Reasoning:</strong> \${question.reasoning}
+            </div>
+        \`;
+        allMcqsList.appendChild(mcqItem);
+    });
+    showPage('all-mcqs-page');
+}
+
+// Initial state
+showPage('signin-page');`;
+
+                jsOutput.value = jsCode;
+            }
+            
+            function copyToClipboard() {
+                if (!jsOutput.value) {
+                    alert('No code to copy. Please process a document first.');
+                    return;
+                }
+                
+                jsOutput.select();
+                document.execCommand('copy');
+                
+                // Show visual feedback
+                const originalText = copyBtn.innerHTML;
+                copyBtn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+                
+                setTimeout(() => {
+                    copyBtn.innerHTML = originalText;
+                }, 2000);
+            }
+            
+            function downloadCode() {
+                if (!jsOutput.value) {
+                    alert('No code to download. Please process a document first.');
+                    return;
+                }
+                
+                const blob = new Blob([jsOutput.value], { type: 'application/javascript' });
+                const url = URL.createObjectURL(blob);
+                
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `quiz-data-${quizIdInput.value || 'quiz'}.js`;
+                document.body.appendChild(a);
+                a.click();
+                
+                // Clean up
+                setTimeout(() => {
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                }, 100);
+            }
+        });
+    </script>
+</body>
+</html>
