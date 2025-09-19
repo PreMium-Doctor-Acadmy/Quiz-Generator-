@@ -3,10 +3,404 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PreMium Doctor Academy - MCQ Extractor Tool</title>
+    <title>PreMium Doctor Academy - Quiz Generator</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.4.17/mammoth.browser.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
+    <style>
+        :root {
+            --primary-blue: #1a56db;
+            --secondary-blue: #0ea5e9;
+            --dark-blue: #1e3a8a;
+            --light-blue: #dbeafe;
+            --accent-green: #10b981;
+            --accent-orange: #f59e0b;
+            --accent-red: #ef4444;
+            --gradient-blue: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+            --gradient-green: linear-gradient(135deg, var(--accent-green), #34d399);
+            --gradient-orange: linear-gradient(135deg, var(--accent-orange), #f97316);
+            --gradient-red: linear-gradient(135deg, var(--accent-red), #f87171);
+            --shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+            --shadow-lg: 0 3px 8px rgba(0, 0, 0, 0.12);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 8px;
+            color: #1e3a8a;
+            font-size: 11px;
+            overflow-x: hidden;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 12px;
+        }
+
+        .logo h1 {
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: var(--dark-blue);
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.08);
+            margin-bottom: 2px;
+        }
+
+        .logo p {
+            color: var(--primary-blue);
+            font-weight: 600;
+            font-size: 0.7rem;
+        }
+
+        header {
+            background: linear-gradient(135deg, #1e3a8a, #1a56db);
+            color: white;
+            padding: 15px;
+            text-align: center;
+            border-radius: 6px;
+            margin-bottom: 15px;
+        }
+
+        h1 {
+            font-size: 0.9rem;
+            margin-bottom: 8px;
+            color: #ffd700;
+        }
+
+        .subtitle {
+            font-size: 0.6rem;
+            line-height: 1.4;
+            text-align: justify;
+        }
+
+        .tabs {
+            display: flex;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            overflow: hidden;
+            border: 1.5px solid var(--light-blue);
+        }
+
+        .tab {
+            flex: 1;
+            padding: 8px;
+            text-align: center;
+            background: #f8fafc;
+            cursor: pointer;
+            font-size: 0.7rem;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .tab.active {
+            background: var(--primary-blue);
+            color: white;
+        }
+
+        .panel {
+            background: white;
+            border-radius: 6px;
+            padding: 12px;
+            box-shadow: var(--shadow-lg);
+            width: 100%;
+            margin-bottom: 15px;
+        }
+
+        .form-group {
+            margin-bottom: 8px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 2px;
+            font-weight: 600;
+            color: var(--dark-blue);
+            font-size: 0.7rem;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 6px 9px;
+            border: 1.5px solid var(--light-blue);
+            border-radius: 5px;
+            font-size: 0.7rem;
+            background: #f8fafc;
+            transition: all 0.2s;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 2px rgba(26, 86, 219, 0.15);
+        }
+
+        textarea {
+            min-height: 150px;
+            font-family: monospace;
+            resize: vertical;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 6px 10px;
+            border: none;
+            border-radius: 5px;
+            font-weight: 700;
+            font-size: 0.7rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+            gap: 4px;
+        }
+
+        .btn-primary {
+            background: var(--gradient-blue);
+            color: white;
+            box-shadow: var(--shadow);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 3px 6px rgba(26, 86, 219, 0.2);
+        }
+
+        .btn-purple {
+            background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+            color: white;
+            box-shadow: var(--shadow);
+        }
+
+        .btn-purple:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 3px 6px rgba(139, 92, 246, 0.2);
+        }
+
+        .btn-green {
+            background: var(--gradient-green);
+            color: white;
+            box-shadow: var(--shadow);
+        }
+
+        .btn-green:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 3px 6px rgba(16, 185, 129, 0.2);
+        }
+
+        .btn-red {
+            background: var(--gradient-red);
+            color: white;
+            box-shadow: var(--shadow);
+        }
+
+        .btn-red:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 3px 6px rgba(239, 68, 68, 0.2);
+        }
+
+        .instructions {
+            background: #e9f7ff;
+            padding: 10px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            font-size: 0.7rem;
+        }
+
+        .instructions h3 {
+            color: var(--primary-blue);
+            margin-bottom: 8px;
+            font-size: 0.8rem;
+        }
+
+        .instructions ol {
+            padding-left: 15px;
+        }
+
+        .instructions li {
+            margin-bottom: 5px;
+            line-height: 1.4;
+        }
+
+        .preview-box {
+            border: 1px solid var(--light-blue);
+            border-radius: 8px;
+            padding: 10px;
+            margin-top: 15px;
+            background: white;
+            max-height: 300px;
+            overflow-y: auto;
+            font-size: 0.7rem;
+        }
+
+        .preview-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--primary-blue);
+            font-size: 0.8rem;
+        }
+
+        .mcq-item {
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .mcq-question {
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: var(--dark-blue);
+        }
+
+        .mcq-options {
+            padding-left: 15px;
+        }
+
+        .mcq-option {
+            margin-bottom: 3px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 5px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .preview-container {
+            margin-top: 20px;
+            border: 1px solid var(--light-blue);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .preview-header {
+            background: var(--primary-blue);
+            color: white;
+            padding: 10px;
+            font-weight: 600;
+            font-size: 0.8rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .preview-frame {
+            width: 100%;
+            height: 500px;
+            border: none;
+        }
+
+        .two-column {
+            display: flex;
+            gap: 15px;
+        }
+
+        .column {
+            flex: 1;
+        }
+
+        .status-message {
+            padding: 8px;
+            border-radius: 4px;
+            margin: 10px 0;
+            font-size: 0.7rem;
+            display: none;
+        }
+
+        .status-success {
+            background: #d1fae5;
+            color: #065f46;
+            border: 1px solid #a7f3d0;
+        }
+
+        .status-error {
+            background: #fee2e2;
+            color: #b91c1c;
+            border: 1px solid #fecaca;
+        }
+
+        @media (max-width: 768px) {
+            .two-column {
+                flex-direction: column;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">
+            <h1>PreMium Doctor Academy</h1>
+            <p>Excellence in Educational Assessment</p>
+        </div>
+        
+        <header>
+            <h1>Quiz Generator Tool</h1>
+            <p class="subtitle">Combine HTML/CSS with JavaScript or generate complete JavaScript code from MCQs to create interactive quizzes</p>
+        </header>
+        
+        <div class="tabs">
+            <div class="tab" data-tab="combine">Combine HTML/CSS & JS</div>
+            <div class="tab active" data-tab="generate">Generate from MCQs</div>
+            <div class="tab" data-tab="preview">Preview Quiz</div>
+        </div>
+        
+        <div class="tab-content" id="combine-tab">
+            <div class="instructions">
+                <h3>How to Use This Tool</h3>
+                <ol>
+                    <li>The HTML/CSS code is already pre-filled with the quiz structure and styling</li>
+                    <li>Paste your JavaScript code in the textarea below</li>
+                    <li>Click the "Merge Code" button to combine everything</li>
+                    <li>Use the "Preview Quiz" tab to see the result</li>
+                    <li>Copy the final code or download it as an HTML file</li>
+                </ol>
+            </div>
+            
+            <div class="two-column">
+                <div class="column">
+                    <div class="panel">
+                        <div class="form-group">
+                            <label for="html-css-input">HTML & CSS Code (Fixed)</label>
+                            <textarea id="html-css-input" readonly>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PreMium Doctor Academy</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
             --primary-blue: #1a56db;
@@ -69,46 +463,53 @@
             font-size: 0.7rem;
         }
 
-        header {
-            background: linear-gradient(135deg, #1e3a8a, #1a56db);
-            color: white;
-            padding: 15px;
-            text-align: center;
-            border-radius: 6px;
-            margin-bottom: 15px;
-        }
-
-        h1 {
-            font-size: 0.9rem;
-            margin-bottom: 8px;
-            color: #ffd700;
-        }
-
-        .subtitle {
-            font-size: 0.6rem;
-            line-height: 1.4;
-            text-align: justify;
-        }
-
-        .main-content {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
-        .panel {
+        .page {
             background: white;
             border-radius: 6px;
             padding: 12px;
             box-shadow: var(--shadow-lg);
             width: 100%;
+            display: none;
+            position: relative;
+        }
+
+        .active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Reusable UI Elements */
+        .promo-banner {
+            background: linear-gradient(135deg, #1e3a8a, #1a56db);
+            color: white;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            text-align: center;
+            font-size: 0.6rem;
+        }
+
+        .promo-banner h2 {
+            font-size: 0.9rem;
+            margin-bottom: 8px;
+            color: #ffd700;
+        }
+
+        .promo-banner p {
+            line-height: 1.4;
+            text-align: justify;
         }
 
         .form-group {
             margin-bottom: 8px;
         }
 
-        label {
+        .form-label {
             display: block;
             margin-bottom: 2px;
             font-weight: 600;
@@ -116,7 +517,7 @@
             font-size: 0.7rem;
         }
 
-        input, select, textarea {
+        .form-input, .form-select {
             width: 100%;
             padding: 6px 9px;
             border: 1.5px solid var(--light-blue);
@@ -126,16 +527,28 @@
             transition: all 0.2s;
         }
 
-        input:focus, select:focus, textarea:focus {
+        .form-input:focus, .form-select:focus {
             outline: none;
             border-color: var(--primary-blue);
             box-shadow: 0 0 0 2px rgba(26, 86, 219, 0.15);
         }
 
-        textarea {
-            min-height: 150px;
-            font-family: monospace;
-            resize: vertical;
+        .input-container {
+            position: relative;
+        }
+
+        .password-container .form-input {
+            padding-right: 30px;
+        }
+
+        .input-icon {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--primary-blue);
+            font-size: 0.7rem;
+            cursor: pointer;
         }
 
         .btn {
@@ -165,6 +578,28 @@
             box-shadow: 0 3px 6px rgba(26, 86, 219, 0.2);
         }
 
+        .btn-contact {
+            background: linear-gradient(135deg, var(--accent-green), #22c55e);
+            color: white;
+            box-shadow: var(--shadow);
+        }
+
+        .btn-contact:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 3px 6px rgba(16, 185, 129, 0.2);
+        }
+
+        .btn-whatsapp {
+            background: linear-gradient(135deg, #25d366, #128c7e);
+            color: white;
+            box-shadow: var(--shadow);
+        }
+
+        .btn-whatsapp:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 3px 6px rgba(37, 211, 102, 0.2);
+        }
+
         .btn-purple {
             background: linear-gradient(135deg, #8b5cf6, #a78bfa);
             color: white;
@@ -176,19 +611,8 @@
             box-shadow: 0 3px 6px rgba(139, 92, 246, 0.2);
         }
 
-        .btn-green {
-            background: var(--gradient-green);
-            color: white;
-            box-shadow: var(--shadow);
-        }
-
-        .btn-green:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 3px 6px rgba(16, 185, 129, 0.2);
-        }
-
         .btn-red {
-            background: var(--gradient-red);
+            background: linear-gradient(135deg, #ef4444, #f87171);
             color: white;
             box-shadow: var(--shadow);
         }
@@ -198,132 +622,455 @@
             box-shadow: 0 3px 6px rgba(239, 68, 68, 0.2);
         }
 
-        .file-upload {
-            border: 2px dashed var(--primary-blue);
-            padding: 20px;
-            text-align: center;
-            border-radius: 8px;
-            margin-bottom: 8px;
-            background: #f0f4ff;
-            cursor: pointer;
-        }
-
-        .file-upload i {
-            font-size: 30px;
-            color: var(--primary-blue);
-            margin-bottom: 10px;
-        }
-
-        .hidden {
+        .error-box {
+            background: #fee2e2;
+            color: var(--accent-red);
+            padding: 5px 7px;
+            border-radius: 3px;
+            margin-top: 6px;
             display: none;
-        }
-
-        .preview-box {
-            border: 1px solid var(--light-blue);
-            border-radius: 8px;
-            padding: 10px;
-            margin-top: 15px;
-            background: white;
-            max-height: 300px;
-            overflow-y: auto;
+            font-weight: 600;
             font-size: 0.7rem;
         }
 
-        .preview-title {
-            font-weight: 600;
+        /* Main Page */
+        .main-page-buttons {
+            display: grid;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        /* Quiz Access Section */
+        .quiz-access-section {
+            display: none;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        /* Payment Section */
+        .payment-info {
+            background: #f0f9ff;
+            border-radius: 5px;
+            padding: 10px;
+            border: 1px solid var(--light-blue);
             margin-bottom: 8px;
-            color: var(--primary-blue);
+        }
+
+        .payment-info h3 {
             font-size: 0.8rem;
+            color: var(--dark-blue);
+            margin-bottom: 6px;
+            text-align: center;
         }
 
-        .mcq-item {
-            margin-bottom: 10px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid #eee;
+        .payment-info p {
+            font-size: 0.7rem;
+            margin-bottom: 4px;
+            line-height: 1.2;
         }
 
-        .mcq-question {
+        .payment-info span {
             font-weight: 600;
-            margin-bottom: 5px;
+        }
+
+        .acknowledgment-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.7rem;
+            margin-top: 8px;
+            font-weight: 500;
+            color: #4b5563;
+        }
+
+        /* Quiz Section */
+        .quiz-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 8px;
+            padding-bottom: 6px;
+            border-bottom: 1.5px solid var(--light-blue);
+        }
+
+        .quiz-title-container {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+            width: 80%;
+        }
+
+        .quiz-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            font-size: 0.7rem;
+            color: var(--dark-blue);
+            font-weight: 600;
+        }
+
+        .timer-container {
+            display: flex;
+            gap: 6px;
+            justify-content: flex-end;
+            width: 100%;
+        }
+
+        .timer, .question-timer {
+            background: var(--gradient-blue);
+            color: white;
+            padding: 3px 6px;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 0.7rem;
+            box-shadow: var(--shadow);
+            white-space: nowrap;
+        }
+
+        .timer.total-timer {
+            background: var(--gradient-orange);
+        }
+
+        .progress-container {
+            width: 100%;
+            height: 4px;
+            background: #e5e7eb;
+            border-radius: 3px;
+            overflow: hidden;
+            margin-bottom: 8px;
+        }
+
+        .progress-bar {
+            height: 100%;
+            border-radius: 3px;
+            transition: width 0.4s ease;
+            background: var(--gradient-blue);
+        }
+
+        .question-nav {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(14px, 1fr));
+            gap: 3px;
+            margin-bottom: 8px;
+        }
+
+        .question-nav-item {
+            width: 14px;
+            height: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 3px;
+            font-weight: 700;
+            font-size: 0.5rem;
+            cursor: pointer;
+            background: white;
+            border: 1.5px solid var(--light-blue);
+            transition: all 0.2s;
+        }
+
+        .question-nav-item.current {
+            background: var(--gradient-blue);
+            color: white;
+            border-color: var(--primary-blue);
+        }
+
+        .question-nav-item.solved {
+            background: var(--gradient-green);
+            color: white;
+            border-color: var(--accent-green);
+        }
+
+        .question-nav-item.visited {
+            background: var(--gradient-orange);
+            color: white;
+            border-color: var(--accent-orange);
+        }
+
+        .question-nav-item.out-of-syllabus {
+            background: var(--gradient-red);
+            color: white;
+            border-color: var(--accent-red);
+        }
+
+        .question-container {
+            margin-bottom: 8px;
+        }
+
+        .question-text {
+            font-size: 0.75rem;
+            font-weight: 700;
+            margin-bottom: 6px;
             color: var(--dark-blue);
         }
 
-        .mcq-options {
-            padding-left: 15px;
+        .options-container {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 4px;
         }
 
-        .mcq-option {
-            margin-bottom: 3px;
-        }
-
-        .action-buttons {
-            display: flex;
-            gap: 5px;
-            margin-top: 15px;
-        }
-
-        .instructions {
-            background: #e9f7ff;
-            padding: 10px;
-            border-radius: 6px;
-            margin-bottom: 15px;
-            font-size: 0.7rem;
-        }
-
-        .instructions h3 {
-            color: var(--primary-blue);
-            margin-bottom: 8px;
-            font-size: 0.8rem;
-        }
-
-        .instructions ol {
-            padding-left: 15px;
-        }
-
-        .instructions li {
-            margin-bottom: 5px;
-            line-height: 1.4;
-        }
-
-        .file-type-selector {
-            display: flex;
-            margin-bottom: 10px;
-            border-radius: 5px;
-            overflow: hidden;
+        .option {
+            padding: 5px 8px;
             border: 1.5px solid var(--light-blue);
-        }
-
-        .file-type-btn {
-            flex: 1;
-            padding: 6px;
-            text-align: center;
-            background: #f8fafc;
+            border-radius: 5px;
             cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 500;
+            background: #f8fafc;
             font-size: 0.7rem;
-            font-weight: 600;
         }
 
-        .file-type-btn.active {
-            background: var(--primary-blue);
+        .option:hover {
+            border-color: var(--primary-blue);
+            background: #e0f2fe;
+        }
+
+        .option.selected {
+            border-color: var(--primary-blue);
+            background: #dbeafe;
+        }
+
+        .option.correct {
+            border-color: var(--accent-green);
+            background: #d1fae5;
+        }
+
+        .option.incorrect {
+            border-color: var(--accent-red);
+            background: #fee2e2;
+        }
+
+        .reasoning {
+            background: #f8fafc;
+            border-radius: 5px;
+            padding: 8px;
+            margin-top: 8px;
+            display: none;
+            border-left: 3px solid var(--primary-blue);
+            font-size: 0.7rem;
+        }
+
+        .reasoning-title {
+            font-weight: 700;
+            margin-bottom: 4px;
+            color: var(--dark-blue);
+            font-size: 0.75rem;
+        }
+
+        .navigation-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            margin-top: 12px;
+        }
+
+        .nav-btn {
+            padding: 5px 7px;
+            border-radius: 5px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+            font-size: 0.7rem;
+            display: flex;
+            align-items: center;
+            gap: 3px;
+            justify-content: center;
+            width: 100%;
+        }
+
+        .btn-back {
+            background: linear-gradient(135deg, #3b82f6, #60a5fa);
             color: white;
         }
 
-        .text-input-area {
-            display: none;
-            margin-bottom: 15px;
+        .btn-next {
+            background: linear-gradient(135deg, #1d4ed8, #3b82f6);
+            color: white;
         }
 
-        .text-input-area.active {
-            display: block;
+        .btn-skip {
+            background: linear-gradient(135deg, #f59e0b, #fbbf24);
+            color: white;
         }
 
-        @media (min-width: 768px) {
-            .main-content {
-                flex-direction: row;
+        .btn-reasoning {
+            background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+            color: white;
+        }
+
+        .btn-out-of-syllabus {
+            background: linear-gradient(135deg, #ef4444, #f87171);
+            color: white;
+        }
+
+        .btn-submit {
+            background: linear-gradient(135deg, #10b981, #34d399);
+            color: white;
+        }
+
+        /* Results Page */
+        .results-header-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            margin-bottom: 12px;
+        }
+
+        .results-header-buttons .btn {
+            padding: 4px 6px;
+            font-size: 0.65rem;
+        }
+
+        .result-card {
+            background: linear-gradient(135deg, #f8fafc, #e0f2fe);
+            border-radius: 6px;
+            padding: 12px;
+            text-align: center;
+            margin-bottom: 12px;
+            box-shadow: var(--shadow);
+        }
+
+        .result-card table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.7rem;
+            margin-top: 8px;
+        }
+
+        .result-card th, .result-card td {
+            padding: 5px;
+            border: 1px solid #dbeafe;
+            text-align: left;
+        }
+
+        .result-card th {
+            background-color: var(--light-blue);
+            font-weight: 600;
+        }
+
+        .result-card td {
+            background-color: #f8fafc;
+        }
+
+        .result-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-top: 12px;
+        }
+
+        /* All MCQs Page */
+        .all-mcqs-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .all-mcq-item {
+            padding: 10px;
+            border: 1px solid var(--light-blue);
+            border-radius: 6px;
+            background: #f8fafc;
+        }
+
+        .all-mcq-item .question-text {
+            color: var(--dark-blue);
+            font-size: 0.8rem;
+            font-weight: 700;
+        }
+
+        .all-mcq-options {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            margin-top: 6px;
+        }
+
+        .all-mcq-option {
+            font-size: 0.7rem;
+            padding: 4px 6px;
+            border-radius: 4px;
+        }
+
+        .all-mcq-option.correct {
+            background: #d1fae5;
+            color: var(--accent-green);
+            font-weight: 600;
+        }
+
+        .all-mcq-reasoning {
+            margin-top: 8px;
+            font-size: 0.7rem;
+            color: #4b5563;
+        }
+
+        .all-mcq-reasoning strong {
+            color: var(--dark-blue);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .quiz-header {
+                flex-direction: column;
+                gap: 6px;
+                align-items: flex-start;
             }
             
-            .left-panel, .right-panel {
-                width: 48%;
+            .navigation-buttons {
+                grid-template-columns: 1fr;
+            }
+            
+            .contact-buttons {
+                grid-template-columns: 1fr;
+            }
+            
+            .compact-contact-buttons {
+                grid-template-columns: 1fr;
+            }
+            
+            .result-actions {
+                flex-direction: column;
+            }
+            
+            .timer-container {
+                position: relative;
+                top: auto;
+                right: auto;
+                margin-top: 5px;
+                justify-content: flex-end;
+                width: 100%;
+            }
+            
+            .quiz-title-container {
+                width: 100%;
+            }
+            
+            .dmc-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .dmc-grades, .dmc-performance-bars {
+                grid-template-columns: 1fr 1fr;
+            }
+            
+            .dmc-watermark {
+                font-size: 2rem;
+            }
+            
+            .promo-banner {
+                padding: 12px;
+            }
+            
+            .promo-banner h2 {
+                font-size: 0.8rem;
+            }
+            
+            .promo-banner p {
+                font-size: 0.55rem;
             }
         }
     </style>
@@ -334,352 +1081,652 @@
             <h1>PreMium Doctor Academy</h1>
             <p>Excellence in Educational Assessment</p>
         </div>
-        
-        <header>
-            <h1>MCQ Extractor Tool</h1>
-            <p class="subtitle">Upload PDF or Word documents with MCQs, or paste MCQs directly to generate JavaScript code for your quiz</p>
-        </header>
-        
-        <div class="main-content">
-            <div class="panel left-panel">
-                <div class="instructions">
-                    <h3>Instructions</h3>
-                    <ol>
-                        <li>Prepare your document with MCQs in the correct format OR paste MCQs directly</li>
-                        <li>Each question should start with "Q:" or a number</li>
-                        <li>Options should be prefixed with a), b), c), d)</li>
-                        <li>Correct answer should be indicated with "Correct Answer: [letter]"</li>
-                        <li>Reasoning should be indicated with "Reasoning: [text]"</li>
-                        <li>Upload your document or paste MCQs using the options below</li>
-                        <li>Review the extracted MCQs and generate the JavaScript code</li>
-                    </ol>
-                </div>
-                
-                <div class="form-group">
-                    <label>Select Input Method</label>
-                    <div class="file-type-selector">
-                        <div class="file-type-btn active" id="docx-btn">Word</div>
-                        <div class="file-type-btn" id="pdf-btn">PDF</div>
-                        <div class="file-type-btn" id="text-btn">Text</div>
-                    </div>
-                </div>
-                
-                <div class="form-group" id="file-upload-section">
-                    <label for="docx-file">Upload Document</label>
-                    <div class="file-upload" id="drop-zone">
-                        <i class="fas fa-file-word" id="file-icon"></i>
-                        <p>Click to upload or drag and drop</p>
-                        <p class="subtitle" id="file-type-text">Only .docx files are accepted</p>
-                        <input type="file" id="docx-file" accept=".docx" class="hidden">
-                    </div>
-                </div>
-                
-                <div class="text-input-area" id="text-input-section">
-                    <label for="mcq-textarea">Paste MCQs (up to 500)</label>
-                    <textarea id="mcq-textarea" placeholder="Paste your MCQs here in the correct format. Example:
-Q: What is the capital of France?
-a) London
-b) Berlin
-c) Paris
-d) Madrid
-Correct Answer: c
-Reasoning: Paris is the capital and most populous city of France.
 
-Q: Which planet is known as the Red Planet?
-a) Venus
-b) Mars
-c) Jupiter
-d) Saturn
-Correct Answer: b
-Reasoning: Mars is often called the Red Planet due to its reddish appearance."></textarea>
-                    <button class="btn btn-primary" id="parse-text-btn">
-                        <i class="fas fa-paragraph"></i> Parse MCQs
-                    </button>
-                </div>
-                
-                <div class="form-group">
-                    <label for="quiz-id">Quiz ID</label>
-                    <input type="text" id="quiz-id" value="PreMium-001" placeholder="Enter quiz ID">
-                </div>
-                
-                <div class="form-group">
-                    <label for="quiz-title">Quiz Title/Subject</label>
-                    <input type="text" id="quiz-title" value="English Grammar MCQs" placeholder="Enter quiz title/subject">
-                </div>
-                
-                <div class="form-group">
-                    <label for="dev-password">Developer Password</label>
-                    <input type="text" id="dev-password" value="Dev-PDA-001" placeholder="Enter developer password">
-                </div>
-                
-                <div class="form-group">
-                    <label for="student-password">Student Password (Quiz Access Code)</label>
-                    <input type="text" id="student-password" value="Dev-PDA-001" placeholder="Enter student password">
-                </div>
-                
-                <div class="form-group">
-                    <label for="time-per-question">Time per Question (seconds)</label>
-                    <input type="number" id="time-per-question" value="60" min="10">
-                </div>
-                
-                <button class="btn btn-primary" id="process-btn">
-                    <i class="fas fa-cogs"></i> Generate JavaScript Code
+        <div id="signin-page" class="page active">
+            <div class="promo-banner">
+                <h2>Unlock Your Potential with PreMium Doctor Academy</h2>
+                <p>Boost your preparation with PreMium Doctor Academy's realistic online tests, crafted by experts to mirror the actual exam's pattern and challenge. Experience instant feedback, detailed analysis, and flexible online access – your pathway to confidence and success!</p>
+            </div>
+            
+            <h2 style="font-size: 0.9rem; margin-bottom: 4px;">Access Test</h2>
+            <p style="font-size: 0.7rem; margin-bottom: 8px;">Sign in or use your access code</p>
+            
+            <div class="main-page-buttons">
+                <button class="btn btn-primary" onclick="showQuizAccessForm()">
+                    <i class="fas fa-lock"></i>
+                    <span>Sign In with Quiz Access Code</span>
                 </button>
-                
-                <div class="preview-box">
-                    <div class="preview-title">Extracted MCQs Preview</div>
-                    <div id="mcq-preview"></div>
+                <button class="btn btn-primary" onclick="showRegistrationPage()">
+                    <i class="fas fa-user-plus"></i>
+                    <span>Sign Up to Get Quiz Access</span>
+                </button>
+                <button class="btn btn-purple" onclick="showDeveloperAccessForm()">
+                    <i class="fas fa-code"></i>
+                    <span>Developer Access</span>
+                </button>
+            </div>
+            
+            <div id="developer-access-form" class="quiz-access-section">
+                <h3 style="font-size: 0.8rem;">Developer Login</h3>
+                <div class="password-container input-container">
+                    <input type="password" id="developerPassword" class="form-input" placeholder="Enter the Developer Password">
+                    <i class="fas fa-eye-slash input-icon" id="toggleDeveloperPassword"></i>
+                </div>
+                <button class="btn btn-purple" onclick="checkDeveloperPassword()">
+                    <span>Log In</span>
+                    <i class="fas fa-arrow-right"></i>
+                </button>
+                <div id="dev-error-box" class="error-box">
+                    Invalid developer password.
                 </div>
             </div>
             
-            <div class="panel right-panel">
+            <div id="quiz-access-form" class="quiz-access-section">
+                <h3 style="font-size: 0.8rem;">Enter Quiz Access Code</h3>
+                <div class="password-container input-container">
+                    <input type="password" id="quizAccessCode" class="form-input" placeholder="Enter your 12-Digit Quiz Access Code here">
+                    <i class="fas fa-eye-slash input-icon" id="toggleQuizAccessCode"></i>
+                </div>
+                <button class="btn btn-primary" onclick="checkQuizAccessCode()">
+                    <span>Access Quiz</span>
+                    <i class="fas fa-arrow-right"></i>
+                </button>
+                <div id="quiz-error-box" class="error-box">
+                    Invalid quiz access code.
+                </div>
+            </div>
+            
+        </div>
+
+        <div id="registration-page" class="page">
+            <div class="promo-banner">
+                <h2>Unlock Your Potential with PreMium Doctor Academy</h2>
+                <p>Boost your preparation with PreMium Doctor Academy's realistic online tests, crafted by experts to mirror the actual exam's pattern and challenge. Experience instant feedback, detailed analysis, and flexible online access – your pathway to confidence and success!</p>
+            </div>
+            
+            <h2 style="font-size: 0.9rem; margin-bottom: 4px;">Student Registration</h2>
+            <p style="font-size: 0.7rem; margin-bottom: 8px;">Please provide your details to register</p>
+            
+            <div class="form-group">
+                <label class="form-label">Student Name</label>
+                <input type="text" id="studentName" class="form-input" placeholder="Enter your full name">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Father Name</label>
+                <input type="text" id="fatherName" class="form-input" placeholder="Enter your father's name">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Email Address</label>
+                <input type="email" id="email" class="form-input" placeholder="Enter your email address">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Mobile Number (WhatsApp)</label>
+                <input type="tel" id="mobile" class="form-input" placeholder="+92XXXXXXXXXX">
+            </div>
+            <div class="form-group">
+            </div>
+            <button class="btn btn-primary" onclick="validateRegistrationForm()">
+                <span>Proceed to Payment</span>
+                <i class="fas fa-arrow-right"></i>
+            </button>
+        </div>
+
+        <div id="payment-page" class="page">
+            <div class="promo-banner">
+                <h2>Unlock Your Potential with PreMium Doctor Academy</h2>
+                <p>Boost your preparation with PreMium Doctor Academy's realistic online tests, crafted by experts to mirror the actual exam's pattern and challenge. Experience instant feedback, detailed analysis, and flexible online access – your pathway to confidence and success!</p>
+            </div>
+            
+            <h2 style="font-size: 0.9rem; margin-bottom: 4px;">Payment Details</h2>
+            <p style="font-size: 0.7rem; margin-bottom: 8px;">Please complete the payment to receive your access code</p>
+            
+            <div class="payment-info">
+                <h3>Payment Information</h3>
+                <p>Please make payment through our official payment methods. After payment, you will receive an access code.</p>
+                <p style="margin-top: 8px; font-weight: bold;">Contact us on WhatsApp at <a href="https://wa.me/923247012882" style="color: var(--accent-green); text-decoration: none;">+923247012882</a> for payment details.</p>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Transaction ID</label>
+                <input type="text" id="transactionId" class="form-input" placeholder="Enter transaction ID">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Your Account Holder Name</label>
+                <input type="text" id="accountHolderName" class="form-input" placeholder="Enter your payment account name">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Amount Sent</label>
+                <input type="number" id="amountSent" class="form-input" placeholder="Enter amount">
+            </div>
+            <div class="acknowledgment-checkbox">
+                <input type="checkbox" id="acknowledgment">
+                <label for="acknowledgment">I acknowledge that I have submitted the correct information and payment.</label>
+            </div>
+            
+            <button class="btn btn-primary" onclick="submitPayment()">
+                <span>Submit Payment Info</span>
+                <i class="fas fa-paper-plane"></i>
+            </button>
+        </div>
+
+        <div id="quiz-access-page" class="page">
+            <div class="promo-banner">
+                <h2>Unlock Your Potential with PreMium Doctor Academy</h2>
+                <p>Boost your preparation with PreMium Doctor Academy's realistic online tests, crafted by experts to mirror the actual exam's pattern and challenge. Experience instant feedback, detailed analysis, and flexible online access – your pathway to confidence and success!</p>
+            </div>
+            
+            <h2 style="font-size: 0.9rem; margin-bottom: 4px;">Quiz Access</h2>
+            <p style="font-size: 0.7rem; margin-bottom: 8px; font-weight: 600;">A Quiz Access Code will be sent to your registered mobile number after we receive and verify your payment.</p>
+
+            <div class="password-container input-container">
+                <input type="password" id="quizAccessFinal" class="form-input" placeholder="Enter your 12-Digit Quiz Access Code here">
+                <i class="fas fa-eye-slash input-icon" id="toggleQuizAccessFinal"></i>
+            </div>
+            
+            <button class="btn btn-primary" onclick="accessQuiz()">
+                <span>Access Quiz</span>
+                <i class="fas fa-arrow-right"></i>
+            </button>
+            
+            <div id="final-quiz-error-box" class="error-box">
+                Invalid quiz access code.
+            </div>
+        </div>
+        
+        <div id="quiz-page" class="page">
+            <div class="promo-banner">
+                <h2 style="font-size: 0.8rem; margin-bottom: 4px;">Unlock Your Potential with PreMium Doctor Academy</h2>
+                <p style="font-size: 0.6rem;">Boost your preparation with PreMium Doctor Academy's realistic online tests, crafted by experts to mirror the actual exam's pattern and challenge. Experience instant feedback, detailed analysis, and flexible online access – your pathway to confidence and success!</p>
+            </div>
+
+            <div class="quiz-header">
+                <div class="quiz-title-container">
+                    <h2 style="font-size: 0.7rem;" id="quiz-title"></h2>
+                    <div class="quiz-info">
+                        <span>Subject: English Grammar</span>
+                        <span>Per MCQ: 1 Minute</span>
+                    </div>
+                </div>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; width: 100%; margin-bottom: 8px;">
+                <div class="timer" id="question-timer">60</div>
+                <div class="timer total-timer" id="timer">40:00</div>
+            </div>
+
+            <div class="progress-container">
+                <div class="progress-bar" id="quiz-progress"></div>
+            </div>
+
+            <div class="question-nav" id="question-nav"></div>
+            
+            <div class="question-container">
+                <div class="question-text" id="question-text"></div>
+                <div class="options-container" id="options-container"></div>
+                <div class="reasoning" id="reasoning">
+                    <div class="reasoning-title">Explanation:</div>
+                    <div id="reasoning-text"></div>
+                </div>
+            </div>
+            
+            <div class="navigation-buttons">
+                <button class="nav-btn btn-back" onclick="navigateQuestion('prev')">
+                    <i class="fas fa-arrow-left"></i> Back
+                </button>
+                <button class="nav-btn btn-next" onclick="navigateQuestion('next')">
+                    Next <i class="fas fa-arrow-right"></i>
+                </button>
+                <button class="nav-btn btn-skip" onclick="navigateQuestion('skip')">
+                    <i class="fas fa-forward"></i> Skip
+                </button>
+                <button class="nav-btn btn-out-of-syllabus" onclick="markOutOfSyllabus()">
+                    <i class="fas fa-ban"></i> Out of Syllabus
+                </button>
+                <button class="nav-btn btn-reasoning" onclick="toggleReasoning()">
+                    <i class="fas fa-lightbulb"></i> Reasoning
+                </button>
+                <button class="nav-btn btn-submit" onclick="submitTest()">
+                    Submit <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+        </div>
+
+        <div id="results-page" class="page">
+            <div class="results-header-buttons">
+                <a href="https://premiumdoctoracademy.com" target="_blank" class="btn btn-primary"><i class="fas fa-globe"></i> Website</a>
+                <a href="https://wa.me/923247012882" target="_blank" class="btn btn-whatsapp"><i class="fab fa-whatsapp"></i> Whatsapp Contact</a>
+                <a href="https://whatsapp.com/channel/0029VbBCnMDHAdNVl9hGKJ3B" target="_blank" class="btn btn-whatsapp"><i class="fab fa-whatsapp"></i> Whatsapp Community</a>
+            </div>
+            
+            <div class="result-card">
+                <h2 style="font-size: 0.9rem;">Student Information</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Field</th>
+                            <th>Detail</th>
+                        </tr>
+                    </thead>
+                    <tbody id="student-info-table"></tbody>
+                </table>
+            </div>
+
+            <div class="result-card">
+                <h2 style="font-size: 0.9rem;">Test Results</h2>
+                <table>
+                    <tbody id="quiz-results-table"></tbody>
+                </table>
+            </div>
+            
+            <div class="result-actions">
+                <button class="btn btn-primary" onclick="restartTest()">
+                    <i class="fas fa-redo"></i> Retake Full Test
+                </button>
+                <button class="btn btn-primary" onclick="retakeIncorrect()">
+                    <i class="fas fa-bolt"></i> Retake Incorrect Questions
+                </button>
+                <button class="btn btn-primary" onclick="viewAllMcqs()">
+                    <i class="fas fa-clipboard-list"></i> View All MCQs
+                </button>
+            </div>
+        </div>
+
+        <div id="all-mcqs-page" class="page">
+            <h2 style="font-size: 0.9rem; margin-bottom: 8px;">All MCQs and Solutions</h2>
+            <div class="all-mcqs-list" id="all-mcqs-list"></div>
+            <button class="btn btn-primary" style="margin-top: 15px;" onclick="showPage('results-page')">
+                <i class="fas fa-arrow-left"></i> Back to Results
+            </button>
+        </div>
+    </div>
+    
+    <!-- JavaScript will be inserted here -->
+</body>
+</html>
+                            </textarea>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="column">
+                    <div class="panel">
+                        <div class="form-group">
+                            <label for="js-input">JavaScript Code (Paste Here)</label>
+                            <textarea id="js-input" placeholder="Paste your JavaScript code here..."></textarea>
+                        </div>
+                        
+                        <button class="btn btn-primary" id="merge-btn">
+                            <i class="fas fa-code"></i> Merge Code
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="panel">
                 <div class="form-group">
-                    <label for="js-output">Generated JavaScript Code</label>
-                    <textarea id="js-output" readonly placeholder="The generated JavaScript code will appear here..."></textarea>
+                    <label for="combined-output">Merged Output</label>
+                    <textarea id="combined-output" readonly placeholder="The merged code will appear here..."></textarea>
                 </div>
                 
                 <div class="action-buttons">
-                    <button class="btn btn-green" id="copy-btn">
-                        <i class="fas fa-copy"></i> Copy Code
+                    <button class="btn btn-green" id="copy-merged-btn">
+                        <i class="fas fa-copy"></i> Copy Merged Code
                     </button>
-                    <button class="btn btn-red" id="download-btn">
-                        <i class="fas fa-download"></i> Download Code
+                    <button class="btn btn-red" id="download-merged-btn">
+                        <i class="fas fa-download"></i> Download as HTML
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="tab-content active" id="generate-tab">
+            <div class="instructions">
+                <h3>Generate JavaScript from MCQs</h3>
+                <ol>
+                    <li>Paste your MCQs in the textarea below (supports multiple formats)</li>
+                    <li>Configure quiz settings as needed</li>
+                    <li>Click the "Generate JavaScript" button to create complete code</li>
+                    <li>Use the generated code in the "Combine HTML/CSS & JS" tab</li>
+                </ol>
+            </div>
+            
+            <div class="two-column">
+                <div class="column">
+                    <div class="panel">
+                        <div class="form-group">
+                            <label for="mcq-input">Paste MCQs (Multiple Formats Supported)</label>
+                            <textarea id="mcq-input" placeholder="Paste your MCQs here. Supported formats:
+
+Format 1:
+Q: What is the main nitrogenous waste excreted by humans?
+a) Ammonia
+b) Urea
+c) Uric acid
+d) Creatinine
+Correct Answer: b
+Reasoning: Humans are ureotelic organisms and excrete urea as the main nitrogenous waste.
+
+Format 2:
+1. Question: What is the common name for (CH3)3COH?
+a) n-Butyl alcohol
+b) sec-Butyl alcohol
+c) Isobutyl alcohol
+d) tert-Butyl alcohol
+Correct Option: d) tert-Butyl alcohol
+Reason For Correct Option: An alcohol where the OH group is attached to a tertiary carbon is called a tertiary alcohol.
+
+Format 3:
+**2. In physics, which of the following is a unit of electrical resistance?**
+a) Volt
+b) Ampere
+c) Ohm
+d) Watt
+**Correct Option: c) Ohm**
+**Reason:** The ohm (symbol: Ω) is the derived SI unit of electrical resistance."></textarea>
+                        </div>
+                        
+                        <button class="btn btn-primary" id="generate-js-btn">
+                            <i class="fas fa-cogs"></i> Generate JavaScript
+                        </button>
+                        
+                        <div id="mcq-preview" class="preview-box">
+                            <div class="preview-title">MCQ Preview</div>
+                            <div id="mcq-preview-content"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="column">
+                    <div class="panel">
+                        <div class="form-group">
+                            <label for="quiz-id-js">Quiz ID</label>
+                            <input type="text" id="quiz-id-js" value="PreMium-001" placeholder="Enter quiz ID">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="quiz-title-js">Quiz Title/Subject</label>
+                            <input type="text" id="quiz-title-js" value="General Knowledge MCQs" placeholder="Enter quiz title/subject">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="dev-password-js">Developer Password</label>
+                            <input type="text" id="dev-password-js" value="Dev-PDA-001" placeholder="Enter developer password">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="student-password-js">Student Password (Quiz Access Code)</label>
+                            <input type="text" id="student-password-js" value="Student-001" placeholder="Enter student password">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="time-per-question-js">Time per Question (seconds)</label>
+                            <input type="number" id="time-per-question-js" value="60" min="10">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="panel">
+                <div class="form-group">
+                    <label for="generated-js-output">Generated JavaScript Code</label>
+                    <textarea id="generated-js-output" readonly placeholder="The generated JavaScript code will appear here..."></textarea>
+                </div>
+                
+                <div class="action-buttons">
+                    <button class="btn btn-green" id="copy-js-btn">
+                        <i class="fas fa-copy"></i> Copy JavaScript Code
+                    </button>
+                    <button class="btn btn-red" id="download-js-btn">
+                        <i class="fas fa-download"></i> Download JavaScript
+                    </button>
+                    <button class="btn btn-purple" id="generate-complete-btn">
+                        <i class="fas fa-bolt"></i> Generate & Merge Complete HTML
                     </button>
                 </div>
                 
-                <div class="instructions">
-                    <h3>How to Use the Generated Code</h3>
-                    <ol>
-                        <li>Copy the generated JavaScript code</li>
-                        <li>Create an HTML file with your quiz layout</li>
-                        <li>Replace the quiz data in your JavaScript with the generated code</li>
-                        <li>Adjust the timer settings if needed</li>
-                        <li>Test your quiz to ensure everything works correctly</li>
-                    </ol>
+                <div id="complete-status" class="status-message"></div>
+            </div>
+        </div>
+        
+        <div class="tab-content" id="preview-tab">
+            <div class="instructions">
+                <h3>Quiz Preview</h3>
+                <p>This preview shows how your quiz will appear to users. Use the buttons below to test different pages of the quiz.</p>
+            </div>
+            
+            <div class="action-buttons">
+                <button class="btn btn-primary" id="preview-signin">
+                    <i class="fas fa-sign-in-alt"></i> Sign In Page
+                </button>
+                <button class="btn btn-primary" id="preview-quiz">
+                    <i class="fas fa-question-circle"></i> Quiz Page
+                </button>
+                <button class="btn btn-primary" id="preview-results">
+                    <i class="fas fa-chart-bar"></i> Results Page
+                </button>
+            </div>
+            
+            <div class="preview-container">
+                <div class="preview-header">
+                    <span>Quiz Preview</span>
+                    <span id="preview-page-name">Sign In Page</span>
                 </div>
+                <iframe class="preview-frame" id="preview-frame" srcdoc=""></iframe>
             </div>
         </div>
     </div>
 
     <script>
-        // Set up PDF.js worker
-        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js';
-
         document.addEventListener('DOMContentLoaded', function() {
-            const fileInput = document.getElementById('docx-file');
-            const dropZone = document.getElementById('drop-zone');
-            const processBtn = document.getElementById('process-btn');
-            const jsOutput = document.getElementById('js-output');
-            const copyBtn = document.getElementById('copy-btn');
-            const downloadBtn = document.getElementById('download-btn');
-            const mcqPreview = document.getElementById('mcq-preview');
-            const quizIdInput = document.getElementById('quiz-id');
-            const quizTitleInput = document.getElementById('quiz-title');
-            const timePerQuestionInput = document.getElementById('time-per-question');
-            const devPasswordInput = document.getElementById('dev-password');
-            const studentPasswordInput = document.getElementById('student-password');
-            const docxBtn = document.getElementById('docx-btn');
-            const pdfBtn = document.getElementById('pdf-btn');
-            const textBtn = document.getElementById('text-btn');
-            const fileIcon = document.getElementById('file-icon');
-            const fileTypeText = document.getElementById('file-type-text');
-            const fileUploadSection = document.getElementById('file-upload-section');
-            const textInputSection = document.getElementById('text-input-section');
-            const mcqTextarea = document.getElementById('mcq-textarea');
-            const parseTextBtn = document.getElementById('parse-text-btn');
+            // Tab switching functionality
+            const tabs = document.querySelectorAll('.tab');
+            const tabContents = document.querySelectorAll('.tab-content');
             
-            let extractedData = [];
-            let currentFileType = 'docx'; // Default file type
-            
-            // Set up file type selection
-            docxBtn.addEventListener('click', () => {
-                setFileType('docx');
-            });
-            
-            pdfBtn.addEventListener('click', () => {
-                setFileType('pdf');
-            });
-            
-            textBtn.addEventListener('click', () => {
-                setFileType('text');
-            });
-            
-            function setFileType(type) {
-                currentFileType = type;
-                if (type === 'docx') {
-                    docxBtn.classList.add('active');
-                    pdfBtn.classList.remove('active');
-                    textBtn.classList.remove('active');
-                    fileInput.accept = '.docx';
-                    fileIcon.className = 'fas fa-file-word';
-                    fileTypeText.textContent = 'Only .docx files are accepted';
-                    fileUploadSection.style.display = 'block';
-                    textInputSection.classList.remove('active');
-                } else if (type === 'pdf') {
-                    docxBtn.classList.remove('active');
-                    pdfBtn.classList.add('active');
-                    textBtn.classList.remove('active');
-                    fileInput.accept = '.pdf';
-                    fileIcon.className = 'fas fa-file-pdf';
-                    fileTypeText.textContent = 'Only .pdf files are accepted';
-                    fileUploadSection.style.display = 'block';
-                    textInputSection.classList.remove('active');
-                } else {
-                    docxBtn.classList.remove('active');
-                    pdfBtn.classList.remove('active');
-                    textBtn.classList.add('active');
-                    fileUploadSection.style.display = 'none';
-                    textInputSection.classList.add('active');
-                }
-            }
-            
-            // Parse text button event listener
-            parseTextBtn.addEventListener('click', () => {
-                const text = mcqTextarea.value;
-                if (!text.trim()) {
-                    alert('Please paste some MCQs in the text area.');
-                    return;
-                }
-                parseMCQs(text);
-            });
-            
-            // Drag and drop functionality
-            dropZone.addEventListener('click', () => fileInput.click());
-            
-            dropZone.addEventListener('dragover', (e) => {
-                e.preventDefault();
-                dropZone.style.background = '#e0e7ff';
-            });
-            
-            dropZone.addEventListener('dragleave', () => {
-                dropZone.style.background = '#f0f4ff';
-            });
-            
-            dropZone.addEventListener('drop', (e) => {
-                e.preventDefault();
-                dropZone.style.background = '#f0f4ff';
-                
-                if (e.dataTransfer.files.length) {
-                    fileInput.files = e.dataTransfer.files;
-                    handleFileUpload(e.dataTransfer.files[0]);
-                }
-            });
-            
-            fileInput.addEventListener('change', (e) => {
-                if (e.target.files.length) {
-                    handleFileUpload(e.target.files[0]);
-                }
-            });
-            
-            processBtn.addEventListener('click', processMCQs);
-            copyBtn.addEventListener('click', copyToClipboard);
-            downloadBtn.addEventListener('click', downloadCode);
-            
-            function handleFileUpload(file) {
-                // Validate file type
-                if (currentFileType === 'docx' && !file.name.endsWith('.docx')) {
-                    alert('Please upload a .docx file');
-                    return;
-                }
-                
-                if (currentFileType === 'pdf' && !file.name.endsWith('.pdf')) {
-                    alert('Please upload a .pdf file');
-                    return;
-                }
-                
-                const reader = new FileReader();
-                
-                reader.onload = function(e) {
-                    const arrayBuffer = e.target.result;
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const tabId = tab.getAttribute('data-tab');
                     
-                    if (currentFileType === 'docx') {
-                        processDocxFile(arrayBuffer);
-                    } else {
-                        processPdfFile(arrayBuffer);
+                    // Update active tab
+                    tabs.forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    
+                    // Show active content
+                    tabContents.forEach(content => content.classList.remove('active'));
+                    document.getElementById(`${tabId}-tab`).classList.add('active');
+                    
+                    // If preview tab is selected, update the preview
+                    if (tabId === 'preview') {
+                        updatePreview();
                     }
-                };
-                
-                reader.readAsArrayBuffer(file);
-            }
-            
-            function processDocxFile(arrayBuffer) {
-                mammoth.extractRawText({ arrayBuffer })
-                    .then(result => {
-                        const text = result.value;
-                        parseMCQs(text);
-                    })
-                    .catch(err => {
-                        console.error('Error extracting text:', err);
-                        alert('Error processing document. Please check the console for details.');
-                    });
-            }
-            
-            function processPdfFile(arrayBuffer) {
-                // Use PDF.js to extract text from PDF
-                const loadingTask = pdfjsLib.getDocument({ data: arrayBuffer });
-                
-                loadingTask.promise.then(pdf => {
-                    let text = '';
-                    const numPages = pdf.numPages;
-                    const extractPageText = pageNum => {
-                        return pdf.getPage(pageNum).then(page => {
-                            return page.getTextContent().then(textContent => {
-                                let lastY = -1;
-                                let pageText = '';
-                                
-                                // Sort text items by Y position
-                                const items = textContent.items;
-                                for (let i = 0; i < items.length; i++) {
-                                    const item = items[i];
-                                    if (lastY !== -1 && Math.abs(lastY - item.transform[5]) > 5) {
-                                        pageText += '\n';
-                                    }
-                                    pageText += item.str + ' ';
-                                    lastY = item.transform[5];
-                                }
-                                
-                                return pageText;
-                            });
-                        });
-                    };
-                    
-                    // Extract text from all pages sequentially
-                    const extractAllPages = async () => {
-                        for (let i = 1; i <= numPages; i++) {
-                            const pageText = await extractPageText(i);
-                            text += pageText + '\n\n';
-                        }
-                        parseMCQs(text);
-                    };
-                    
-                    extractAllPages();
-                }).catch(err => {
-                    console.error('Error extracting text from PDF:', err);
-                    alert('Error processing PDF. Please check the console for details.');
                 });
+            });
+            
+            // Merge code functionality
+            const mergeBtn = document.getElementById('merge-btn');
+            const jsInput = document.getElementById('js-input');
+            const combinedOutput = document.getElementById('combined-output');
+            
+            mergeBtn.addEventListener('click', () => {
+                const htmlCssCode = document.getElementById('html-css-input').value;
+                const jsCode = jsInput.value;
+                
+                // Combine the code by replacing the placeholder comment
+                const mergedCode = htmlCssCode.replace('<!-- JavaScript will be inserted here -->', `<script>\n${jsCode}\n<\/script>`);
+                combinedOutput.value = mergedCode;
+            });
+            
+            // Copy merged code
+            document.getElementById('copy-merged-btn').addEventListener('click', () => {
+                combinedOutput.select();
+                document.execCommand('copy');
+                alert('Merged code copied to clipboard!');
+            });
+            
+            // Download merged code
+            document.getElementById('download-merged-btn').addEventListener('click', () => {
+                const blob = new Blob([combinedOutput.value], { type: 'text/html' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'quiz.html';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            });
+            
+            // Generate JavaScript from MCQs
+            const generateJsBtn = document.getElementById('generate-js-btn');
+            const mcqInput = document.getElementById('mcq-input');
+            const generatedJsOutput = document.getElementById('generated-js-output');
+            
+            // Preview MCQs as they're typed
+            mcqInput.addEventListener('input', updateMcqPreview);
+            
+            generateJsBtn.addEventListener('click', () => {
+                const mcqText = mcqInput.value;
+                const quizId = document.getElementById('quiz-id-js').value;
+                const quizTitle = document.getElementById('quiz-title-js').value;
+                const devPassword = document.getElementById('dev-password-js').value;
+                const studentPassword = document.getElementById('student-password-js').value;
+                const timePerQuestion = document.getElementById('time-per-question-js').value;
+                
+                // Parse MCQs and generate JavaScript code
+                const jsCode = generateJavaScriptFromMCQs(mcqText, quizId, quizTitle, devPassword, studentPassword, timePerQuestion);
+                generatedJsOutput.value = jsCode;
+                
+                // Also update the JS input in the combine tab
+                document.getElementById('js-input').value = jsCode;
+            });
+            
+            // Copy JavaScript code
+            document.getElementById('copy-js-btn').addEventListener('click', () => {
+                generatedJsOutput.select();
+                document.execCommand('copy');
+                alert('JavaScript code copied to clipboard!');
+            });
+            
+            // Download JavaScript code
+            document.getElementById('download-js-btn').addEventListener('click', () => {
+                const blob = new Blob([generatedJsOutput.value], { type: 'application/javascript' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'quiz-data.js';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            });
+            
+            // Generate complete HTML with JavaScript
+            document.getElementById('generate-complete-btn').addEventListener('click', () => {
+                const mcqText = mcqInput.value;
+                if (!mcqText.trim()) {
+                    showStatus('Please paste some MCQs first', 'error');
+                    return;
+                }
+                
+                const quizId = document.getElementById('quiz-id-js').value;
+                const quizTitle = document.getElementById('quiz-title-js').value;
+                const devPassword = document.getElementById('dev-password-js').value;
+                const studentPassword = document.getElementById('student-password-js').value;
+                const timePerQuestion = document.getElementById('time-per-question-js').value;
+                
+                // Parse MCQs and generate JavaScript code
+                const jsCode = generateJavaScriptFromMCQs(mcqText, quizId, quizTitle, devPassword, studentPassword, timePerQuestion);
+                
+                // Get the HTML/CSS code
+                const htmlCssCode = document.getElementById('html-css-input').value;
+                
+                // Combine the code by replacing the placeholder comment
+                const mergedCode = htmlCssCode.replace('<!-- JavaScript will be inserted here -->', `<script>\n${jsCode}\n<\/script>`);
+                
+                // Update the combined output in the first tab
+                combinedOutput.value = mergedCode;
+                
+                // Also update the JS input in the combine tab
+                document.getElementById('js-input').value = jsCode;
+                
+                // Show success message
+                showStatus('Complete HTML with JavaScript generated successfully! You can now copy or download it from the Combine tab.', 'success');
+                
+                // Switch to the combine tab
+                tabs.forEach(t => t.classList.remove('active'));
+                document.querySelector('[data-tab="combine"]').classList.add('active');
+                tabContents.forEach(content => content.classList.remove('active'));
+                document.getElementById('combine-tab').classList.add('active');
+            });
+            
+            // Preview functionality
+            document.getElementById('preview-signin').addEventListener('click', () => {
+                document.getElementById('preview-page-name').textContent = 'Sign In Page';
+                updatePreview('signin');
+            });
+            
+            document.getElementById('preview-quiz').addEventListener('click', () => {
+                document.getElementById('preview-page-name').textContent = 'Quiz Page';
+                updatePreview('quiz');
+            });
+            
+            document.getElementById('preview-results').addEventListener('click', () => {
+                document.getElementById('preview-page-name').textContent = 'Results Page';
+                updatePreview('results');
+            });
+            
+            function updateMcqPreview() {
+                const mcqText = mcqInput.value;
+                if (!mcqText.trim()) {
+                    document.getElementById('mcq-preview-content').innerHTML = '<p>No MCQs to preview. Paste some questions to see a preview.</p>';
+                    return;
+                }
+                
+                // Parse the MCQs for preview
+                const questions = parseMCQs(mcqText);
+                let previewHtml = '';
+                
+                if (questions.length === 0) {
+                    previewHtml = '<p>No valid MCQs found. Please check your format.</p>';
+                } else {
+                    questions.forEach((q, index) => {
+                        previewHtml += `
+                            <div class="mcq-item">
+                                <div class="mcq-question">${index + 1}. ${q.question}</div>
+                                <div class="mcq-options">
+                                    <div class="mcq-option">a) ${q.options[0] || ''}</div>
+                                    <div class="mcq-option">b) ${q.options[1] || ''}</div>
+                                    <div class="mcq-option">c) ${q.options[2] || ''}</div>
+                                    <div class="mcq-option">d) ${q.options[3] || ''}</div>
+                                </div>
+                                <div><strong>Correct Answer:</strong> ${String.fromCharCode(97 + q.correctAnswer)}</div>
+                                ${q.reasoning ? `<div><strong>Reasoning:</strong> ${q.reasoning}</div>` : ''}
+                            </div>
+                        `;
+                    });
+                    
+                    previewHtml += `<p>Found ${questions.length} questions.</p>`;
+                }
+                
+                document.getElementById('mcq-preview-content').innerHTML = previewHtml;
             }
             
-            function parseMCQs(text) {
-                // Reset extracted data
-                extractedData = [];
-                mcqPreview.innerHTML = '';
-                
-                // Split text into lines and remove empty lines
-                const lines = text.split('\n').map(line => line.trim()).filter(line => line);
-                
+            function parseMCQs(mcqText) {
+                const questions = [];
+                const lines = mcqText.split('\n');
                 let currentQuestion = null;
                 
                 for (let i = 0; i < lines.length; i++) {
-                    const line = lines[i];
+                    const line = lines[i].trim();
+                    
+                    if (!line) continue;
                     
                     // Detect question
-                    if (line.match(/^(\d+\.|Q:)/)) {
+                    if (line.match(/^(Q:|Question:|\d+\.|\*\*\d+\.)/)) {
                         if (currentQuestion) {
-                            extractedData.push(currentQuestion);
+                            questions.push(currentQuestion);
                         }
                         
                         currentQuestion = {
-                            question: line.replace(/^(\d+\.|Q:)\s*/, ''),
+                            question: line.replace(/^(Q:|Question:|\d+\.|\*\*\d+\.\s*\*?)\s*/, '').replace(/\*\*/g, ''),
                             options: [],
                             correctAnswer: null,
                             reasoning: ''
@@ -687,97 +1734,151 @@ Reasoning: Mars is often called the Red Planet due to its reddish appearance."><
                     }
                     // Detect options (a), b), etc.)
                     else if (line.match(/^[a-d]\)/) && currentQuestion) {
-                        currentQuestion.options.push(line.replace(/^[a-d]\)\s*/, ''));
+                        const optionText = line.replace(/^[a-d]\)\s*/, '');
+                        currentQuestion.options.push(optionText);
                     }
                     // Detect correct answer
-                    else if (line.match(/^Correct Answer:/i) && currentQuestion) {
-                        const match = line.match(/Correct Answer:\s*([a-d])/i);
+                    else if (line.match(/^(Correct Answer:|Correct Option:)/i) && currentQuestion) {
+                        // Improved regex to capture the correct answer letter
+                        const match = line.match(/Correct (Answer|Option):\s*([a-d])/i);
                         if (match) {
                             // Convert a->0, b->1, c->2, d->3
-                            currentQuestion.correctAnswer = match[1].charCodeAt(0) - 97;
+                            currentQuestion.correctAnswer = match[2].toLowerCase().charCodeAt(0) - 97;
+                        } else {
+                            // Try alternative format where answer might be embedded in text
+                            const altMatch = line.match(/([a-d])\)/i);
+                            if (altMatch) {
+                                currentQuestion.correctAnswer = altMatch[1].toLowerCase().charCodeAt(0) - 97;
+                            }
                         }
                     }
                     // Detect reasoning
-                    else if (line.match(/^Reasoning:/i) && currentQuestion) {
-                        currentQuestion.reasoning = line.replace(/^Reasoning:\s*/i, '');
+                    else if (line.match(/^(Reasoning:|Reason For Correct Option:|Reason:)/i) && currentQuestion) {
+                        currentQuestion.reasoning = line.replace(/^(Reasoning:|Reason For Correct Option:|Reason:)\s*/i, '');
+                        // Check if the next lines are also part of the reasoning
+                        for (let j = i + 1; j < lines.length; j++) {
+                            const nextLine = lines[j].trim();
+                            if (!nextLine || nextLine.match(/^(Q:|Question:|\d+\.)/)) break;
+                            if (!nextLine.match(/^(Correct Answer:|Correct Option:)/i)) {
+                                currentQuestion.reasoning += ' ' + nextLine;
+                                i = j; // Skip these lines in the main loop
+                            } else {
+                                break;
+                            }
+                        }
                     }
                     // If we're in a question and the line doesn't match any pattern, assume it's part of the question
-                    else if (currentQuestion && !currentQuestion.options.length) {
+                    else if (currentQuestion && currentQuestion.options.length === 0) {
                         currentQuestion.question += ' ' + line;
+                    }
+                    // If we have options but no correct answer yet, assume it's part of reasoning
+                    else if (currentQuestion && currentQuestion.correctAnswer === null) {
+                        // This might be part of the options if we don't have 4 options yet
+                        if (currentQuestion.options.length < 4 && line.match(/^[e-z]\)/i)) {
+                            // It's an additional option beyond d, which we don't support
+                        } else {
+                            // It's probably part of the reasoning
+                            currentQuestion.reasoning += ' ' + line;
+                        }
                     }
                 }
                 
                 // Push the last question
                 if (currentQuestion) {
-                    extractedData.push(currentQuestion);
+                    questions.push(currentQuestion);
                 }
                 
-                // Display preview
-                renderPreview();
-            }
-            
-            function renderPreview() {
-                mcqPreview.innerHTML = '';
-                
-                if (extractedData.length === 0) {
-                    mcqPreview.innerHTML = '<p>No MCQs extracted. Please check your document format.</p>';
-                    return;
-                }
-                
-                extractedData.forEach((mcq, index) => {
-                    const mcqEl = document.createElement('div');
-                    mcqEl.className = 'mcq-item';
-                    
-                    let optionsHtml = '';
-                    mcq.options.forEach((option, optIndex) => {
-                        optionsHtml += `<div class="mcq-option"><strong>${String.fromCharCode(97 + optIndex)})</strong> ${option}</div>`;
-                    });
-                    
-                    mcqEl.innerHTML = `
-                        <div class="mcq-question">${index + 1}. ${mcq.question}</div>
-                        <div class="mcq-options">${optionsHtml}</div>
-                        <div><strong>Correct Answer:</strong> ${String.fromCharCode(97 + mcq.correctAnswer)}</div>
-                        <div><strong>Reasoning:</strong> ${mcq.reasoning}</div>
-                    `;
-                    
-                    mcqPreview.appendChild(mcqEl);
+                // Ensure all questions have 4 options
+                questions.forEach(q => {
+                    while (q.options.length < 4) {
+                        q.options.push(`Option ${String.fromCharCode(65 + q.options.length)}`);
+                    }
                 });
+                
+                return questions;
             }
             
-            function processMCQs() {
-                if (extractedData.length === 0) {
-                    alert('No MCQs to process. Please upload a document or paste MCQs first.');
-                    return;
+            function updatePreview(page = 'signin') {
+                let previewHtml = '';
+                
+                if (combinedOutput.value) {
+                    previewHtml = combinedOutput.value;
+                } else {
+                    // Default preview with sample content
+                    previewHtml = document.getElementById('html-css-input').value;
+                    
+                    // Add minimal JavaScript for preview functionality
+                    previewHtml = previewHtml.replace('<!-- JavaScript will be inserted here -->', `
+                        <script>
+                            function showPage(pageId) {
+                                const pages = document.querySelectorAll('.page');
+                                pages.forEach(page => page.classList.remove('active'));
+                                document.getElementById(pageId).classList.add('active');
+                            }
+                            
+                            function showQuizAccessForm() {
+                                document.getElementById('quiz-access-form').style.display = 'flex';
+                                document.getElementById('developer-access-form').style.display = 'none';
+                            }
+                            
+                            function showDeveloperAccessForm() {
+                                document.getElementById('developer-access-form').style.display = 'flex';
+                                document.getElementById('quiz-access-form').style.display = 'none';
+                            }
+                            
+                            function showRegistrationPage() {
+                                showPage('registration-page');
+                            }
+                            
+                            // Show the requested page in preview
+                            showPage('${page}-page');
+                        <\/script>
+                    `);
                 }
                 
-                // Limit to 500 MCQs
-                if (extractedData.length > 500) {
-                    alert(`You have ${extractedData.length} MCQs. Only the first 500 will be processed.`);
-                    extractedData = extractedData.slice(0, 500);
-                }
+                document.getElementById('preview-frame').srcdoc = previewHtml;
+            }
+            
+            function showStatus(message, type) {
+                const statusEl = document.getElementById('complete-status');
+                statusEl.textContent = message;
+                statusEl.className = 'status-message';
+                statusEl.classList.add(type === 'success' ? 'status-success' : 'status-error');
+                statusEl.style.display = 'block';
                 
-                const quizId = quizIdInput.value || 'PreMium-001';
-                const quizTitle = quizTitleInput.value || 'English Grammar MCQs';
-                const devPassword = devPasswordInput.value || 'Dev-PDA-001';
-                const studentPassword = studentPasswordInput.value || 'Dev-PDA-001';
+                // Auto hide after 5 seconds
+                setTimeout(() => {
+                    statusEl.style.display = 'none';
+                }, 5000);
+            }
+            
+            // Function to generate JavaScript from MCQs
+            function generateJavaScriptFromMCQs(mcqText, quizId, quizTitle, devPassword, studentPassword, timePerQuestion) {
+                const questions = parseMCQs(mcqText);
+                
+                if (questions.length === 0) {
+                    return "// No valid questions found. Please check your MCQ format.";
+                }
                 
                 // Generate the JavaScript code
                 let jsCode = `// Quiz data - ${quizTitle}
 const quizData_${quizId.replace(/-/g, '_')} = [\n`;
                 
-                extractedData.forEach((mcq, index) => {
+                questions.forEach((q, index) => {
                     jsCode += `    {\n`;
-                    jsCode += `        question: "${mcq.question.replace(/"/g, '\\"')}",\n`;
+                    jsCode += `        question: "${q.question.replace(/"/g, '\\"')}",\n`;
                     jsCode += `        options: [\n`;
                     
-                    mcq.options.forEach(option => {
+                    // Ensure we have at least 4 options
+                    for (let i = 0; i < 4; i++) {
+                        const option = q.options[i] || (i === 0 ? "Option A" : i === 1 ? "Option B" : i === 2 ? "Option C" : "Option D");
                         jsCode += `            "${option.replace(/"/g, '\\"')}",\n`;
-                    });
+                    }
                     
                     jsCode += `        ],\n`;
-                    jsCode += `        correctAnswer: ${mcq.correctAnswer},\n`;
-                    jsCode += `        reasoning: "${mcq.reasoning.replace(/"/g, '\\"')}"\n`;
-                    jsCode += `    }${index < extractedData.length - 1 ? ',' : ''}\n`;
+                    jsCode += `        correctAnswer: ${q.correctAnswer !== null ? q.correctAnswer : 0},\n`;
+                    jsCode += `        reasoning: "${(q.reasoning || "No reasoning provided").replace(/"/g, '\\"')}"\n`;
+                    jsCode += `    }${index < questions.length - 1 ? ',' : ''}\n`;
                 });
                 
                 jsCode += `];
@@ -786,7 +1887,7 @@ const quizData_${quizId.replace(/-/g, '_')} = [\n`;
 const QUIZ_ACCESS_CODE = "${studentPassword}";
 const DEV_ACCESS_CODE = "${devPassword}";
 
-let currentQuizId = '${quizId}'; // Default quiz ID
+let currentQuizId = '${quizId}';
 let quizData = quizData_${quizId.replace(/-/g, '_')};
 let currentQuestion = 0;
 let userAnswers = Array(quizData.length).fill(null);
@@ -828,9 +1929,9 @@ const toggleQuizCodeIcon = document.getElementById('toggleQuizAccessCode');
 const toggleFinalQuizIcon = document.getElementById('toggleQuizAccessFinal');
 
 // Event listeners for password visibility
-toggleDevPasswordIcon.addEventListener('click', () => togglePasswordVisibility('developerPassword', 'toggleDeveloperPassword'));
-toggleQuizCodeIcon.addEventListener('click', () => togglePasswordVisibility('quizAccessCode', 'toggleQuizAccessCode'));
-toggleFinalQuizIcon.addEventListener('click', () => togglePasswordVisibility('quizAccessFinal', 'toggleQuizAccessFinal'));
+if (toggleDevPasswordIcon) toggleDevPasswordIcon.addEventListener('click', () => togglePasswordVisibility('developerPassword', 'toggleDeveloperPassword'));
+if (toggleQuizCodeIcon) toggleQuizCodeIcon.addEventListener('click', () => togglePasswordVisibility('quizAccessCode', 'toggleQuizAccessCode'));
+if (toggleFinalQuizIcon) toggleFinalQuizIcon.addEventListener('click', () => togglePasswordVisibility('quizAccessFinal', 'toggleQuizAccessFinal'));
 
 // Functions
 function showPage(pageId) {
@@ -896,7 +1997,7 @@ function accessQuiz() {
 }
 
 function validateRegistrationForm() {
-    const fields = ['studentName', 'fatherName', 'email', 'mobile', 'testType'];
+    const fields = ['studentName', 'fatherName', 'email', 'mobile'];
     for (const field of fields) {
         if (document.getElementById(field).value.trim() === '') {
             alert('Please fill in all the registration details.');
@@ -908,8 +2009,7 @@ function validateRegistrationForm() {
         'Student Name': document.getElementById('studentName').value,
         'Father Name': document.getElementById('fatherName').value,
         'Email Address': document.getElementById('email').value,
-        'Mobile Number': document.getElementById('mobile').value,
-        'Test Type': document.getElementById('testType').value
+        'Mobile Number': document.getElementById('mobile').value
     };
 
     // Save to local storage
@@ -956,9 +2056,9 @@ function startQuiz(quizId, userType) {
     userAnswers = Array(quizData.length).fill(null);
     outOfSyllabusQuestions = Array(quizData.length).fill(false);
     
-    // Set total time to 1 minute per question (40 minutes total)
-    timeLeft = quizData.length * 60;
-    questionTimeLeft = 60;
+    // Set total time based on time per question
+    timeLeft = quizData.length * ${timePerQuestion};
+    questionTimeLeft = ${timePerQuestion};
 
     showPage('quiz-page');
     initQuiz();
@@ -993,7 +2093,7 @@ function updateQuestionTimer() {
         questionTimeLeft--;
         questionTimerEl.textContent = \`\${questionTimeLeft}\`;
     } else {
-        questionTimeLeft = 60;
+        questionTimeLeft = ${timePerQuestion};
         navigateQuestion('next');
     }
 }
@@ -1051,7 +2151,7 @@ function renderQuestion() {
         optionsContainerEl.appendChild(optionEl);
     });
     
-    questionTimeLeft = 60;
+    questionTimeLeft = ${timePerQuestion};
     questionTimerEl.textContent = \`\${questionTimeLeft}\`;
     renderQuestionNav();
 }
@@ -1136,18 +2236,18 @@ function submitTest() {
         // Populate student info table
         let studentInfoHtml = '';
         for (const [key, value] of Object.entries(savedStudentData)) {
-            studentInfoHtml += \`<tr><th>\${key}</th><td>\${value}</td></tr>\`;
+            studentInfoHtml += \`<tr><td>\${key}</td><td>\${value}</td></tr>\`;
         }
         studentInfoTable.innerHTML = studentInfoHtml;
 
         // Populate quiz results table
         quizResultsTable.innerHTML = \`
-            <tr><th>Total Questions</th><td>\${totalQuestions}</td></tr>
-            <tr><th>Correct Answers</th><td>\${correct}</td></tr>
-            <tr><th>Incorrect Answers</th><td>\${incorrect}</td></tr>
-            <tr><th>Unanswered</th><td>\${unanswered}</td></tr>
-            <tr><th>Out of Syllabus</th><td>\${outOfSyllabus}</td></tr>
-            <tr><th>Your Score</th><td>\${totalScore} / \${totalQuestions * 4}</td></tr>
+            <tr><td>Total Questions</td><td>\${totalQuestions}</td></tr>
+            <tr><td>Correct Answers</td><td>\${correct}</td></tr>
+            <tr><td>Incorrect Answers</td><td>\${incorrect}</td></tr>
+            <tr><td>Unanswered</td><td>\${unanswered}</td></tr>
+            <tr><td>Out of Syllabus</td><td>\${outOfSyllabus}</td></tr>
+            <tr><td>Your Score</td><td>\${totalScore} / \${totalQuestions * 4}</td></tr>
         \`;
 
         showPage('results-page');
@@ -1161,7 +2261,7 @@ function restartTest() {
         currentQuestion = 0;
         userAnswers = Array(quizData.length).fill(null);
         outOfSyllabusQuestions = Array(quizData.length).fill(false);
-        timeLeft = quizData.length * 60;
+        timeLeft = quizData.length * ${timePerQuestion};
         
         showPage('quiz-page');
         initQuiz();
@@ -1183,7 +2283,7 @@ function retakeIncorrect() {
     currentQuestion = 0;
     userAnswers = Array(quizData.length).fill(null);
     outOfSyllabusQuestions = Array(quizData.length).fill(false);
-    timeLeft = quizData.length * 60;
+    timeLeft = quizData.length * ${timePerQuestion};
     
     showPage('quiz-page');
     initQuiz();
@@ -1215,48 +2315,12 @@ function viewAllMcqs() {
 // Initial state
 showPage('signin-page');`;
 
-                jsOutput.value = jsCode;
+                return jsCode;
             }
             
-            function copyToClipboard() {
-                if (!jsOutput.value) {
-                    alert('No code to copy. Please process a document first.');
-                    return;
-                }
-                
-                jsOutput.select();
-                document.execCommand('copy');
-                
-                // Show visual feedback
-                const originalText = copyBtn.innerHTML;
-                copyBtn.innerHTML = '<i class="fas fa-check"></i> Copied!';
-                
-                setTimeout(() => {
-                    copyBtn.innerHTML = originalText;
-                }, 2000);
-            }
-            
-            function downloadCode() {
-                if (!jsOutput.value) {
-                    alert('No code to download. Please process a document first.');
-                    return;
-                }
-                
-                const blob = new Blob([jsOutput.value], { type: 'application/javascript' });
-                const url = URL.createObjectURL(blob);
-                
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `quiz-data-${quizIdInput.value || 'quiz'}.js`;
-                document.body.appendChild(a);
-                a.click();
-                
-                // Clean up
-                setTimeout(() => {
-                    document.body.removeChild(a);
-                    URL.revokeObjectURL(url);
-                }, 100);
-            }
+            // Initialize with signin page preview
+            updatePreview('signin');
+            updateMcqPreview();
         });
     </script>
 </body>
